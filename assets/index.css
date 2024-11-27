@@ -1,0 +1,63 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+
+  user-select: none;
+}
+
+html,
+body {
+  overflow: hidden;
+  background-color: black;
+}
+
+#webgl {
+  display: block;
+  margin: 0 auto;
+  background-color: black;
+
+  max-width: 100%;
+  max-height: 100%;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  overflow: hidden;
+}
+
+canvas {
+  max-width: 100%;
+  max-height: 100%;
+
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.uiCard {
+  font-family: monospace;
+
+  z-index: 1000;
+
+  padding: 10px;
+
+  background-color: rgba(37, 37, 37, 0.5);
+  color: white;
+}
+
+.debugMenu {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.controls {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.divider {
+  margin: 10px 0;
+  border-bottom: 1px solid white;
+}

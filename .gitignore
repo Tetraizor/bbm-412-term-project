@@ -1,0 +1,50 @@
+# TypeScript v1 declaration files
+typings/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+
+# next.js build output
+.next
+
+# Lighthouse CI test output
+.lighthouseci
+
+# build artifacts
+dist
+
+# DS_Store
+.DS_Store
+
+# IDEs
+.idea
+entrypoint.hashmanifest.json
+.vscode
+
+# Temporary files
+.cache
+.tmp
+.cache
+.firebase
+firebase.json
+src/scss/_tokens.scss
+src/scss/_themes.scss
+
+# Eleventy
+# We generate our own .eleventyignore file dynamically during builds
+.eleventyignore

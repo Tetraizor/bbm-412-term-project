@@ -1,1 +1,1 @@
-# bbm-412-term-project
+# BBM 412 Term Project

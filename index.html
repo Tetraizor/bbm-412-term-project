@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <title>BBM 412 - Term Project</title>
+    <link
+        rel="stylesheet"
+        href="assets/index.css"
+    >
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
+            "three/examples/jsm/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+        }
+    }
+    </script>
+</head>
+
+<body>
+    <div id="webgl"></div>
+    <div class="debugMenu uiCard">
+        <h3>Debug Menu</h3>
+        <div class="divider"></div>
+        <p id="fpsCounter">FPS: 60</p>
+        <p id="deltaCounter">Delta Time: 0.66ms</p>
+    </div>
+    <div class="controls uiCard">
+        <h3>Controls</h3>
+        <div class="divider"></div>
+        <p>Look: Hold RMB + Drag</p>
+        <p>Fly: WASD</p>
+    </div>
+    <script
+        type="module"
+        src="src/main.js"
+    ></script>
+</body>
+
+</html>
