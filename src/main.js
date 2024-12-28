@@ -13,6 +13,9 @@ import DirectionalLight from './components/light/directionalLight.js';
 
 import { loadFBX, loadTexture } from './loader.js';
 import Suzanne from './behaviours/suzanne.js';
+import Ball from './behaviours/ball.js';
+import Magnet from './behaviours/magnet.js';
+import MagneticField from './behaviours/magneticField.js';
 
 function prerender() {
     cumulativeFPS += core.fps;
@@ -27,6 +30,8 @@ let FPSCount = 0;
 
 let cumulativeMS = 0;
 let MSCount = 0;
+
+const scene = [];
 
 async function start() {
     engine.initialize();
@@ -55,19 +60,43 @@ async function start() {
     camera.transform.position = new Vector3(0, 0, 5);
 
     engine.instantiate(camera);
+    
+    // Create Magnet
+    const magnet1 = new GameObject('Magnet', [
+        new Renderer(new THREE.BoxGeometry(0.2, 0.2, 0.6), new THREE.MeshLambertMaterial({ color: 0xFF0000 })),
+        new Magnet()
+    ], ['magnet']);
+    magnet1.setScene(scene);
+    magnet1.transform.position = new Vector3(2, 0, 0);
+    engine.instantiate(magnet1);
 
-    const suzanneModel = await loadFBX('../models/suzanne.fbx');
-    const material = new THREE.MeshLambertMaterial({ color: 0x00FFFF });
+    const magnet2 = new GameObject('Magnet', [
+        new Renderer(new THREE.BoxGeometry(0.2, 0.2, 0.6), new THREE.MeshLambertMaterial({ color: 0x0000FF })),
+        new Magnet()
+    ], ['magnet']);
+    magnet2.setScene(scene);
+    magnet2.transform.position = new Vector3(-2, 0, 0);
+    engine.instantiate(magnet2);
 
-    const suzanne = new GameObject('Suzanne', [
-        new Renderer(suzanneModel, material),
-        new Suzanne()
-    ], ['suzanne']);
+    // Create a GameObject that will manage the magnetic field
+    const magneticFieldObject = new GameObject("MagneticField", [
+        new MagneticField(),
+    ], ["magneticField"]);
+    magneticFieldObject.setScene(scene);
+    // Add it to the scene
+    engine.instantiate(magneticFieldObject);
 
-    suzanne.transform.position = new Vector3(0, 0, 0);
-    suzanne.transform.rotation = new Vector3(0, 0, 0);
+    // Create Ball
+    const ballMaterial = new THREE.MeshLambertMaterial({ color: 0x00FF00 });
+    const ballModel = await loadFBX('../models/ball.fbx');
+    const ball = new GameObject('Ball', [
+        new Renderer(ballModel, ballMaterial),
+        new Ball()
+    ], ['ball']);
+    ball.setScene(scene);
+    ball.transform.position = new Vector3(0, 0, 0);
+    engine.instantiate(ball);
 
-    engine.instantiate(suzanne);
 
     const directionalLight = new GameObject('DirectionalLight', [
         new DirectionalLight({ color: new THREE.Color(1, 1, 1), intensity: 1 })
