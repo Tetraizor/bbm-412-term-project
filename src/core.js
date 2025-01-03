@@ -46,6 +46,12 @@ export default {
         } else {
             console.error('Cannot find element with id "webgl"');
         }
+
+        window.addEventListener('resize', () => {
+            this.renderer.setSize(window.innerWidth, window.innerHeight);
+            this.camera.aspect = window.innerWidth / window.innerHeight;
+            this.camera.updateProjectionMatrix();
+        });
     },
 
     // Check if WebGL2 is available and start rendering loop
