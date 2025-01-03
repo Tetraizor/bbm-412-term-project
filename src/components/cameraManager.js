@@ -121,7 +121,6 @@ export default class CameraManager extends Component {
         this.velocity.add(movementVector.multiplyScalar(this.acceleration * deltaTime));
 
         // Decelerate when no keys are pressed
-
         if (!(this.keys['w'] || this.keys['s'] || this.keys['a'] || this.keys['d'])) {
             const decelerationVector = this.velocity.clone().normalize().multiplyScalar(this.deceleration * deltaTime);
             decelerationVector.multiplyScalar(5);

@@ -1,25 +1,26 @@
-import engine from './engine.js';
-import core from './core.js';
+import engine from "./engine.js";
+import core from "./core.js";
 
-import { Vector3 } from 'three';
-import * as THREE from 'three';
+import { Vector3 } from "three";
+import * as THREE from "three";
 
-import GameObject from './gameObject.js';
-import Renderer from './components/renderer.js';
-import ObjectSpawner from './components/objectSpawner.js';
-import CameraManager from './components/cameraManager.js';
-import AmbientLight from './components/light/ambientLight.js';
-import DirectionalLight from './components/light/directionalLight.js';
+import GameObject from "./gameObject.js";
+import Renderer from "./components/renderer.js";
+import ObjectSpawner from "./components/objectSpawner.js";
+import CameraManager from "./components/cameraManager.js";
+import AmbientLight from "./components/light/ambientLight.js";
+import DirectionalLight from "./components/light/directionalLight.js";
 
-import { loadFBX, loadTexture } from './loader.js';
-import Suzanne from './behaviours/suzanne.js';
+import { loadFBX, loadTexture } from "./loader.js";
+import Suzanne from "./behaviours/suzanne.js";
+import resourceManager from "./resourceManager.js";
 
 function prerender() {
-    cumulativeFPS += core.fps;
-    FPSCount++;
+  cumulativeFPS += core.fps;
+  FPSCount++;
 
-    cumulativeMS += core.deltaTime;
-    MSCount++;
+  cumulativeMS += core.deltaTime;
+  MSCount++;
 }
 
 let cumulativeFPS = 0;
@@ -29,80 +30,138 @@ let cumulativeMS = 0;
 let MSCount = 0;
 
 async function start() {
-    engine.initialize();
-    core.addPreRenderHook(prerender);
+  await initializeEngine();
+  await loadResources();
+  await createInitialScene();
+  await createTemporarySceneObjects();
+}
 
-    setInterval(() => {
-        document.getElementById('fpsCounter').innerHTML = `FPS: ${Math.round(cumulativeFPS / FPSCount)}`;
-        document.getElementById('deltaCounter').innerHTML = `Delta: ${Math.round(cumulativeMS / MSCount)}ms`;
+async function initializeEngine() {
+  engine.initialize();
+  core.addPreRenderHook(prerender);
 
-        cumulativeFPS = 0;
-        FPSCount = 0;
+  setInterval(() => {
+    document.getElementById("fpsCounter").innerHTML = `FPS: ${Math.round(
+      cumulativeFPS / FPSCount
+    )}`;
+    document.getElementById("deltaCounter").innerHTML = `Delta: ${Math.round(
+      cumulativeMS / MSCount
+    )}ms`;
 
-        cumulativeMS = 0;
-        MSCount = 0;
-    }, 100);
+    cumulativeFPS = 0;
+    FPSCount = 0;
 
-    const spawner = new GameObject('Spawner', [
-        new ObjectSpawner(),
-    ], ['spawner']);
+    cumulativeMS = 0;
+    MSCount = 0;
+  }, 100);
+}
 
-    engine.instantiate(spawner);
+async function loadResources() {
+  await resourceManager.loadMaterial(
+    "customMaterial",
+    "../materials/customV.glsl",
+    "../materials/customF.glsl",
+    {
+      colorB: { type: "vec3", value: new THREE.Color(0xacb6e5) },
+      colorA: { type: "vec3", value: new THREE.Color(0x74ebd5) },
+    }
+  );
+}
 
-    const camera = new GameObject('Camera', [
-        new CameraManager()
-    ], ['camera']);
-    camera.transform.position = new Vector3(0, 0, 5);
+async function createInitialScene() {
+  const spawner = new GameObject("Spawner", [new ObjectSpawner()], ["spawner"]);
 
-    engine.instantiate(camera);
+  engine.instantiate(spawner);
 
-    const suzanneModel = await loadFBX('../models/suzanne.fbx');
-    const material = new THREE.MeshLambertMaterial({ color: 0x00FFFF });
+  const camera = new GameObject("Camera", [new CameraManager()], ["camera"]);
+  camera.transform.position = new Vector3(0, 0, 5);
 
-    const suzanne = new GameObject('Suzanne', [
-        new Renderer(suzanneModel, material),
-        new Suzanne()
-    ], ['suzanne']);
+  engine.instantiate(camera);
 
-    suzanne.transform.position = new Vector3(0, 0, 0);
-    suzanne.transform.rotation = new Vector3(0, 0, 0);
+  const directionalLight = new GameObject(
+    "DirectionalLight",
+    [new DirectionalLight({ color: new THREE.Color(1, 1, 1), intensity: 1 })],
+    ["directionalLight"]
+  );
 
-    engine.instantiate(suzanne);
+  directionalLight.transform.position = new Vector3(3, 3, 3);
+  directionalLight.transform.rotation = new Vector3(
+    -Math.PI / 4,
+    Math.PI / 4,
+    0
+  );
 
-    const directionalLight = new GameObject('DirectionalLight', [
-        new DirectionalLight({ color: new THREE.Color(1, 1, 1), intensity: 1 })
-    ], ['directionalLight']);
+  engine.instantiate(directionalLight);
+}
 
-    directionalLight.transform.position = new Vector3(3, 3, 3);
-    directionalLight.transform.rotation = new Vector3(-Math.PI / 4, Math.PI / 4, 0);
+async function createTemporarySceneObjects() {
+  const suzanneMaterial =
+    resourceManager.getMaterial("customMaterial").material;
+  console.log(suzanneMaterial);
 
-    engine.instantiate(directionalLight);
+  const suzanneModel = await loadFBX("../models/suzanne.fbx");
 
-    const plane = new GameObject('Plane', [
-        new Renderer(new THREE.PlaneGeometry(4, 4), new THREE.MeshLambertMaterial({ color: 0xFFFFFF })),
-    ], ['plane']);
+  const suzanne = new GameObject(
+    "Suzanne",
+    [new Renderer(suzanneModel, suzanneMaterial), new Suzanne()],
+    ["suzanne"]
+  );
 
-    plane.transform.position = new Vector3(0, -2, 0);
-    plane.transform.rotation = new Vector3(-(Math.PI / 2), 0, 0);
+  suzanne.transform.position = new Vector3(0, 0, 0);
+  suzanne.transform.rotation = new Vector3(0, 0, 0);
 
-    engine.instantiate(plane);
+  engine.instantiate(suzanne);
 
-    const ambientLight = new GameObject('AmbientLight', [
-        new AmbientLight({ color: new THREE.Color(242 / 255, 231 / 255, 206 / 255), intensity: 1 })
-    ], ['ambientLight']);
+  const plane = new GameObject(
+    "Plane",
+    [
+      new Renderer(
+        new THREE.PlaneGeometry(4, 4),
+        new THREE.MeshLambertMaterial({ color: 0xffffff })
+      ),
+    ],
+    ["plane"]
+  );
 
-    engine.instantiate(ambientLight);
+  plane.transform.position = new Vector3(0, -2, 0);
+  plane.transform.rotation = new Vector3(-(Math.PI / 2), 0, 0);
 
-    const debugTexture = await loadTexture('../textures/debug/texture_09.png');
-    debugTexture.wrapS = THREE.RepeatWrapping;
-    debugTexture.wrapT = THREE.RepeatWrapping;
-    debugTexture.repeat.set(10, 10);
+  engine.instantiate(plane);
 
-    const room = new GameObject('Room', [
-        new Renderer(new THREE.BoxGeometry(20, 20, 20), new THREE.MeshLambertMaterial({ color: 0xFFFFFF, map: debugTexture, side: THREE.BackSide })),
-    ], ['room']);
+  const ambientLight = new GameObject(
+    "AmbientLight",
+    [
+      new AmbientLight({
+        color: new THREE.Color(242 / 255, 231 / 255, 206 / 255),
+        intensity: 1,
+      }),
+    ],
+    ["ambientLight"]
+  );
 
-    engine.instantiate(room);
+  engine.instantiate(ambientLight);
+
+  const debugTexture = await loadTexture("../textures/debug/texture_09.png");
+  debugTexture.wrapS = THREE.RepeatWrapping;
+  debugTexture.wrapT = THREE.RepeatWrapping;
+  debugTexture.repeat.set(10, 10);
+
+  const room = new GameObject(
+    "Room",
+    [
+      new Renderer(
+        new THREE.BoxGeometry(20, 20, 20),
+        new THREE.MeshLambertMaterial({
+          color: 0xffffff,
+          map: debugTexture,
+          side: THREE.BackSide,
+        })
+      ),
+    ],
+    ["room"]
+  );
+
+  engine.instantiate(room);
 }
 
 await start();
