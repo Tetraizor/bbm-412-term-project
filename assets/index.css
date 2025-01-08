@@ -51,13 +51,70 @@ canvas {
   left: 0;
 }
 
-.controls {
+.modalController {
   position: absolute;
   top: 0;
   left: 0;
+
+  width: 100%;
+  height: 100%;
+
+  background-color: rgba(0, 0, 0, 0.595);
+
+  pointer-events: all;
+
+  backdrop-filter: blur(3px);
+  transition: background-color 0.3s ease, backdrop-filter 0.3s ease;
+}
+
+.modalController.hidden {
+  backdrop-filter: blur(0);
+
+  background-color: transparent;
+  pointer-events: none;
+}
+
+.modal {
+  font-family: "Noto Sans", sans-serif;
+
+  z-index: 1000;
+
+  padding: 1.4rem;
+
+  background-color: rgb(255, 255, 255);
+  color: black;
+
+  border-radius: 0.8rem;
+
+  position: absolute;
+
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+
+  pointer-events: all;
+
+  transition: background-color 0.3s ease, color 0.3s ease, top 0.3s ease;
+}
+
+.modal.hidden {
+  top: -50%;
+
+  background-color: transparent;
+  pointer-events: none;
+}
+
+.settings {
+  width: 512px;
+}
+
+.help {
+  width: 356px;
 }
 
 .divider {
   margin: 10px 0;
-  border-bottom: 1px solid white;
+  border-bottom: 1px solid black;
 }

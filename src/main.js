@@ -14,6 +14,9 @@ import DirectionalLight from "./components/light/directionalLight.js";
 import Suzanne from "./behaviours/suzanne.js";
 import resourceManager from "./resourceManager.js";
 import GizmoRenderer from "./components/gizmoRenderer.js";
+import UIManager from "./uiManager.js";
+
+const uiManager = new UIManager();
 
 function prerender() {
   cumulativeFPS += core.fps;

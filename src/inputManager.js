@@ -1,10 +1,10 @@
 document.addEventListener("DOMContentLoaded", (event) => {
   // Mouse events
-  document.addEventListener("click", (event) => {
+  document.getElementById("webgl").addEventListener("click", (event) => {
     console.log(`Mouse Clicked at: (${event.clientX}, ${event.clientY})`);
   });
 
-  document.addEventListener("mousemove", (event) => {
+  document.getElementById("webgl").addEventListener("mousemove", (event) => {
     console.log(`Mouse Moved to: (${event.clientX}, ${event.clientY})`);
   });
 

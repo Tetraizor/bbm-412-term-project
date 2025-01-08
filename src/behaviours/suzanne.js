@@ -9,7 +9,7 @@ export default class Suzanne extends Component {
   }
 
   start() {
-    document.addEventListener("mousedown", (event) => {
+    document.getElementById("webgl").addEventListener("mousedown", (event) => {
       if (event.button == 0) {
         if (this.speed == 0) {
           this.speed = this.speed + 0.001;

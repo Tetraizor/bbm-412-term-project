@@ -24,13 +24,23 @@ export default class DirectionalLight extends LightBase {
       this.gameObject.transform.rotation.z
     );
 
+    document.getElementById("lightX").addEventListener("input", (event) => {
+      this.gameObject.transform.rotation.x = (event.target.value * Math.PI) / 2;
+    });
+
+    document.getElementById("lightY").addEventListener("input", (event) => {
+      this.gameObject.transform.rotation.y = (event.target.value * Math.PI) / 2;
+    });
+
+    document.getElementById("lightZ").addEventListener("input", (event) => {
+      this.gameObject.transform.rotation.z = (event.target.value * Math.PI) / 2;
+    });
+
     core.scene.add(this.light);
   }
 
   update() {
     super.update();
-
-    this.gameObject.transform.rotation.x += 0.001 * core.deltaTime;
 
     if (
       this.light.position.x != this.gameObject.transform.position.x ||
