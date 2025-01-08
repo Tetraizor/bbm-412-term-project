@@ -1,49 +1,98 @@
-import Component from './component.js';
-import * as THREE from 'three';
-import core from '../core.js';
+import Component from "./component.js";
+import * as THREE from "three";
+import core from "../core.js";
+import engine from "../engine.js";
+import AmbientLight from "./light/ambientLight.js";
+import DirectionalLight from "./light/directionalLight.js";
 
 export default class Renderer extends Component {
-    mesh = null;
+  mesh = null;
 
-    material = () => { return this.mesh.material };
-    geometry = () => { return this.mesh.geometry };
+  material = () => {
+    return this.mesh.material;
+  };
+  geometry = () => {
+    return this.mesh.geometry;
+  };
 
-    constructor(geometry, material) {
-        super();
+  constructor(geometry, material) {
+    super();
 
-        if (!geometry || !material) {
-            throw new Error('Renderer component requires a geometry and a material');
-        }
-
-        this.material = material;
-        this.geometry = geometry;
-
-        if (geometry.isObject3D) {
-            this.geometry = geometry.children[0].geometry;
-            this.mesh = new THREE.Mesh(geometry.children[0].geometry, this.material);
-
-            core.createMesh(this.mesh);
-        } else {
-            this.geometry = geometry;
-            this.mesh = new THREE.Mesh(this.geometry, this.material);
-
-            core.createMesh(this.mesh);
-        }
+    if (!geometry || !material) {
+      throw new Error("Renderer component requires a geometry and a material");
     }
 
-    start() {
+    this.material = material;
+    this.geometry = geometry;
+
+    if (geometry.isObject3D) {
+      this.geometry = geometry.children[0].geometry;
+      this.mesh = new THREE.Mesh(geometry.children[0].geometry, this.material);
+
+      core.createMesh(this.mesh);
+    } else {
+      this.geometry = geometry;
+      this.mesh = new THREE.Mesh(this.geometry, this.material);
+
+      core.createMesh(this.mesh);
+    }
+  }
+
+  start() {}
+
+  update() {
+    this.mesh.position.set(
+      this.gameObject.transform?.position.x,
+      this.gameObject.transform?.position.y,
+      this.gameObject.transform?.position.z
+    );
+    this.mesh.rotation.set(
+      this.gameObject.transform?.rotation.x,
+      this.gameObject.transform?.rotation.y,
+      this.gameObject.transform?.rotation.z
+    );
+
+    if (core.directionalLight) {
+      const lightDirection =
+        core.directionalLight.getComponent(DirectionalLight).light.target
+          .position;
+      lightDirection.sub(core.directionalLight.transform.position);
+
+      lightDirection.normalize();
+
+      this.updateUniform("lightDirection", lightDirection);
+
+      this.updateUniform(
+        "lightColor",
+        core.directionalLight.getComponent(DirectionalLight).light.color
+      );
+      this.updateUniform(
+        "lightIntensity",
+        core.directionalLight.getComponent(DirectionalLight).light.intensity
+      );
     }
 
-    update() {
-        this.mesh.position.set(this.gameObject.transform?.position.x, this.gameObject.transform?.position.y, this.gameObject.transform?.position.z);
-        this.mesh.rotation.set(this.gameObject.transform?.rotation.x, this.gameObject.transform?.rotation.y, this.gameObject.transform?.rotation.z);
+    if (core.ambientLight) {
+      this.updateUniform(
+        "ambientColor",
+        core.ambientLight.getComponent(AmbientLight).light.color
+      );
+      this.updateUniform(
+        "ambientIntensity",
+        core.ambientLight.getComponent(AmbientLight).light.intensity
+      );
     }
 
-    updateUniform(name, value) {
-        this.material.uniforms[name].value = value;
-    }
+    this.material.needsUpdate = true;
+  }
 
-    destroy() {
-        core.removeMesh(this.mesh);
+  updateUniform(name, value) {
+    if (this.material.uniforms?.hasOwnProperty(name)) {
+      this.material.uniforms[name].value = value;
     }
+  }
+
+  destroy() {
+    core.removeMesh(this.mesh);
+  }
 }

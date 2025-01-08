@@ -39,7 +39,10 @@ export default {
     }
   },
   findObjectById: function (id) {
-    return gameObject.find((obj) => obj.id === id);
+    return gameObjects.find((obj) => obj.id === id);
+  },
+  findObjectByName: function (name) {
+    return gameObjects.find((obj) => obj.name === name);
   },
 };
 

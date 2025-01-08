@@ -5,6 +5,8 @@ export default {
   scene: null,
   camera: null,
   renderer: null,
+  directionalLight: null,
+  ambientLight: null,
 
   prerenderHooks: [],
   postrenderHooks: [],

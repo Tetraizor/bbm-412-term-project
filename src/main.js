@@ -11,9 +11,9 @@ import CameraManager from "./components/cameraManager.js";
 import AmbientLight from "./components/light/ambientLight.js";
 import DirectionalLight from "./components/light/directionalLight.js";
 
-import { loadFBX, loadTexture } from "./loader.js";
 import Suzanne from "./behaviours/suzanne.js";
 import resourceManager from "./resourceManager.js";
+import GizmoRenderer from "./components/gizmoRenderer.js";
 
 function prerender() {
   cumulativeFPS += core.fps;
@@ -57,14 +57,46 @@ async function initializeEngine() {
 }
 
 async function loadResources() {
+  // Load models.
+  await resourceManager.loadModel("suzanne", "../models/suzanne.fbx");
+
+  // Load materials.
   await resourceManager.loadMaterial(
-    "customMaterial",
-    "../materials/customV.glsl",
-    "../materials/customF.glsl",
+    "toon",
+    "../materials/toonV.glsl",
+    "../materials/toonF.glsl",
     {
-      colorB: { type: "vec3", value: new THREE.Color(0xacb6e5) },
-      colorA: { type: "vec3", value: new THREE.Color(0x74ebd5) },
+      lightDirection: { value: new THREE.Vector3(1, 1, 1).normalize() },
+      lightColor: { value: new THREE.Color(1, 1, 1) },
+      lightIntensity: { value: 1 },
+      ambientColor: { value: new THREE.Color(0.2, 0.2, 0.2) },
+      threshold1: { value: 0.3 },
+      threshold2: { value: 0.7 },
+      ambientIntensity: { value: 0.0 },
+      baseColor: { value: new THREE.Color(0.4, 0, 0.2) },
     }
+  );
+
+  await resourceManager.loadMaterial(
+    "lambertian",
+    "../materials/lambertianV.glsl",
+    "../materials/lambertianF.glsl",
+    {
+      lightPosition: { value: new THREE.Vector3(10, 10, 10) },
+      lightColor: { value: new THREE.Color(1, 1, 1) },
+      lightIntensity: { value: 1 },
+      lightDirection: { value: new THREE.Vector3(1, 1, 1).normalize() },
+      diffuseColor: { value: new THREE.Color(0.5, 0.5, 1) },
+      ambientColor: { value: new THREE.Color(0.2, 0.2, 0.2) },
+      ambientIntensity: { value: 0.01 },
+      baseColor: { value: new THREE.Color(0.4, 0, 0.2) },
+    }
+  );
+
+  // Load textures.
+  await resourceManager.loadTexture(
+    "debugTexture",
+    "../textures/debug/texture_09.png"
   );
 }
 
@@ -95,33 +127,44 @@ async function createInitialScene() {
 }
 
 async function createTemporarySceneObjects() {
-  const suzanneMaterial =
-    resourceManager.getMaterial("customMaterial").material;
-  console.log(suzanneMaterial);
+  const lambertianMaterial = resourceManager.getMaterial("lambertian");
+  const toonMaterial = resourceManager.getMaterial("toon");
+  const suzanneModel = resourceManager.getModel("suzanne");
 
-  const suzanneModel = await loadFBX("../models/suzanne.fbx");
-
-  const suzanne = new GameObject(
-    "Suzanne",
-    [new Renderer(suzanneModel, suzanneMaterial), new Suzanne()],
+  const suzanne1 = new GameObject(
+    "Suzanne1",
+    [new Renderer(suzanneModel, lambertianMaterial), new Suzanne()],
     ["suzanne"]
   );
 
-  suzanne.transform.position = new Vector3(0, 0, 0);
-  suzanne.transform.rotation = new Vector3(0, 0, 0);
+  const suzanne2 = new GameObject(
+    "Suzanne2",
+    [new Renderer(suzanneModel, toonMaterial), new Suzanne()],
+    ["suzanne"]
+  );
 
-  engine.instantiate(suzanne);
+  suzanne1.transform.position = new Vector3(2, 0, 0);
+  suzanne1.transform.rotation = new Vector3(-Math.PI / 2, 0, 0);
+
+  suzanne2.transform.position = new Vector3(-2, 0, 0);
+  suzanne2.transform.rotation = new Vector3(-Math.PI / 2, 0, 0);
+
+  engine.instantiate(suzanne1);
+  engine.instantiate(suzanne2);
 
   const plane = new GameObject(
     "Plane",
     [
       new Renderer(
         new THREE.PlaneGeometry(4, 4),
-        new THREE.MeshLambertMaterial({ color: 0xffffff })
+        resourceManager.getMaterial("lambertian")
       ),
     ],
     ["plane"]
   );
+
+  plane.getComponent(Renderer).material.uniforms.baseColor.value =
+    new THREE.Color(1, 1, 1);
 
   plane.transform.position = new Vector3(0, -2, 0);
   plane.transform.rotation = new Vector3(-(Math.PI / 2), 0, 0);
@@ -133,15 +176,33 @@ async function createTemporarySceneObjects() {
     [
       new AmbientLight({
         color: new THREE.Color(242 / 255, 231 / 255, 206 / 255),
-        intensity: 1,
+        intensity: 0.15,
       }),
     ],
     ["ambientLight"]
   );
 
-  engine.instantiate(ambientLight);
+  const directionalLight = new GameObject(
+    "DirectionalLight",
+    [
+      new DirectionalLight({
+        color: new THREE.Color(1, 1, 1),
+        intensity: 1,
+      }),
+      new GizmoRenderer(),
+    ],
+    ["directionalLight"]
+  );
 
-  const debugTexture = await loadTexture("../textures/debug/texture_09.png");
+  engine.instantiate(ambientLight);
+  engine.instantiate(directionalLight);
+
+  core.ambientLight = ambientLight;
+  core.directionalLight = directionalLight;
+
+  directionalLight.transform.position = new Vector3(0, 0, 0);
+
+  const debugTexture = resourceManager.getTexture("debugTexture");
   debugTexture.wrapS = THREE.RepeatWrapping;
   debugTexture.wrapT = THREE.RepeatWrapping;
   debugTexture.repeat.set(10, 10);
