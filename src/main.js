@@ -40,7 +40,7 @@ async function start() {
 }
 
 async function initializeEngine() {
-  engine.initialize();
+  await engine.initialize();
   core.addPreRenderHook(prerender);
 
   setInterval(() => {
@@ -60,8 +60,19 @@ async function initializeEngine() {
 }
 
 async function loadResources() {
+  // Load textures.
+  await resourceManager.loadTexture(
+    "debugTexture",
+    "../textures/debug/texture_09.png"
+  );
+
+  await resourceManager.loadTexture("tableTexture", "../textures/table.png");
+
   // Load models.
   await resourceManager.loadModel("suzanne", "../models/suzanne.fbx");
+  await resourceManager.loadModel("table", "../models/table.fbx");
+  await resourceManager.loadModel("plane", "../models/island.fbx");
+  await resourceManager.loadModel("sea", "../models/sea.fbx");
 
   // Load materials.
   await resourceManager.loadMaterial(
@@ -73,10 +84,10 @@ async function loadResources() {
       lightColor: { value: new THREE.Color(1, 1, 1) },
       lightIntensity: { value: 1 },
       ambientColor: { value: new THREE.Color(0.2, 0.2, 0.2) },
-      threshold1: { value: 0.3 },
-      threshold2: { value: 0.7 },
       ambientIntensity: { value: 0.0 },
       baseColor: { value: new THREE.Color(0.4, 0, 0.2) },
+      baseTexture: { value: resourceManager.getTexture("debugTexture") },
+      time: { value: 0 },
     }
   );
 
@@ -93,13 +104,25 @@ async function loadResources() {
       ambientColor: { value: new THREE.Color(0.2, 0.2, 0.2) },
       ambientIntensity: { value: 0.01 },
       baseColor: { value: new THREE.Color(0.4, 0, 0.2) },
+      baseTexture: { value: resourceManager.getTexture("debugTexture") },
+      time: { value: 0 },
     }
   );
 
-  // Load textures.
-  await resourceManager.loadTexture(
-    "debugTexture",
-    "../textures/debug/texture_09.png"
+  await resourceManager.loadMaterial(
+    "sea",
+    "../materials/seaV.glsl",
+    "../materials/seaF.glsl",
+    {
+      lightDirection: { value: new THREE.Vector3(1, 1, 1).normalize() },
+      lightColor: { value: new THREE.Color(1, 1, 1) },
+      lightIntensity: { value: 1 },
+      ambientColor: { value: new THREE.Color(0.2, 0.2, 0.2) },
+      ambientIntensity: { value: 0.0 },
+      baseColor: { value: new THREE.Color(0, 0, 1) },
+      baseTexture: { value: resourceManager.getTexture("debugTexture") },
+      time: { value: 0 },
+    }
   );
 }
 
@@ -109,7 +132,8 @@ async function createInitialScene() {
   engine.instantiate(spawner);
 
   const camera = new GameObject("Camera", [new CameraManager()], ["camera"]);
-  camera.transform.position = new Vector3(0, 0, 5);
+  camera.transform.position = new Vector3(0, 3.3, 2);
+  camera.transform.rotation = new Vector3(-Math.PI / 4, 0, 0);
 
   engine.instantiate(camera);
 
@@ -122,8 +146,8 @@ async function createInitialScene() {
   directionalLight.transform.position = new Vector3(3, 3, 3);
   directionalLight.transform.rotation = new Vector3(
     -Math.PI / 4,
-    Math.PI / 4,
-    0
+    0,
+    -Math.PI / 4
   );
 
   engine.instantiate(directionalLight);
@@ -132,7 +156,12 @@ async function createInitialScene() {
 async function createTemporarySceneObjects() {
   const lambertianMaterial = resourceManager.getMaterial("lambertian");
   const toonMaterial = resourceManager.getMaterial("toon");
+  const seaMaterial = resourceManager.getMaterial("sea");
+
   const suzanneModel = resourceManager.getModel("suzanne");
+  const tableModel = resourceManager.getModel("table");
+  const islandModel = resourceManager.getModel("plane");
+  const seaModel = resourceManager.getModel("sea");
 
   const suzanne1 = new GameObject(
     "Suzanne1",
@@ -146,14 +175,55 @@ async function createTemporarySceneObjects() {
     ["suzanne"]
   );
 
-  suzanne1.transform.position = new Vector3(2, 0, 0);
-  suzanne1.transform.rotation = new Vector3(-Math.PI / 2, 0, 0);
+  const tableMaterial = toonMaterial.clone();
+  tableMaterial.uniforms.baseColor.value = new THREE.Color(1, 1, 1);
+  tableMaterial.uniforms.baseTexture.value =
+    resourceManager.getTexture("tableTexture");
 
-  suzanne2.transform.position = new Vector3(-2, 0, 0);
+  const table = new GameObject(
+    "Table",
+    [new Renderer(tableModel, tableMaterial)],
+    ["table"]
+  );
+
+  const islandMaterial = toonMaterial.clone();
+  islandMaterial.uniforms.baseColor.value = new THREE.Color(1, 1, 1);
+  islandMaterial.uniforms.baseTexture.value =
+    resourceManager.getTexture("debugTexture");
+
+  const island = new GameObject(
+    "Island",
+    [new Renderer(islandModel, islandMaterial)],
+    ["island"]
+  );
+
+  seaMaterial.uniforms.baseColor.value = new THREE.Color(0, 0, 1);
+  seaMaterial.uniforms.baseTexture.value =
+    resourceManager.getTexture("debugTexture");
+
+  const sea = new GameObject(
+    "Sea",
+    [new Renderer(seaModel, seaMaterial)],
+    ["sea"]
+  );
+
+  suzanne1.transform.position = new Vector3(2, 5, 0);
+  suzanne2.transform.position = new Vector3(-2, 5, 0);
+  table.transform.position = new Vector3(0, 0, 0);
+  island.transform.position = new Vector3(0, 0, 0);
+  sea.transform.position = new Vector3(0, -1, 0);
+
+  suzanne1.transform.rotation = new Vector3(-Math.PI / 2, 0, 0);
   suzanne2.transform.rotation = new Vector3(-Math.PI / 2, 0, 0);
+  table.transform.rotation = new Vector3(-Math.PI / 2, 0, 0);
+  island.transform.rotation = new Vector3(-Math.PI / 2, 0, 0);
+  sea.transform.rotation = new Vector3(-Math.PI / 2, 0, 0);
 
   engine.instantiate(suzanne1);
   engine.instantiate(suzanne2);
+  engine.instantiate(table);
+  engine.instantiate(island);
+  engine.instantiate(sea);
 
   const plane = new GameObject(
     "Plane",
@@ -169,7 +239,7 @@ async function createTemporarySceneObjects() {
   plane.getComponent(Renderer).material.uniforms.baseColor.value =
     new THREE.Color(1, 1, 1);
 
-  plane.transform.position = new Vector3(0, -2, 0);
+  plane.transform.position = new Vector3(0, 0, 0);
   plane.transform.rotation = new Vector3(-(Math.PI / 2), 0, 0);
 
   engine.instantiate(plane);
@@ -209,23 +279,6 @@ async function createTemporarySceneObjects() {
   debugTexture.wrapS = THREE.RepeatWrapping;
   debugTexture.wrapT = THREE.RepeatWrapping;
   debugTexture.repeat.set(10, 10);
-
-  const room = new GameObject(
-    "Room",
-    [
-      new Renderer(
-        new THREE.BoxGeometry(20, 20, 20),
-        new THREE.MeshLambertMaterial({
-          color: 0xffffff,
-          map: debugTexture,
-          side: THREE.BackSide,
-        })
-      ),
-    ],
-    ["room"]
-  );
-
-  engine.instantiate(room);
 }
 
 await start();

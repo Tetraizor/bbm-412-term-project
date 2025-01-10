@@ -8,9 +8,9 @@ import { Vector3 } from "three";
 export default class CameraManager extends Component {
   coreCamera = null;
   velocity = new Vector3(0, 0, 0); // Velocity for smooth movement
-  acceleration = 30; // Acceleration rate (units per second squared)
-  deceleration = 10; // Deceleration rate (units per second squared)
-  maxSpeed = 8; // Maximum speed (units per second)
+  acceleration = 15; // Acceleration rate (units per second squared)
+  deceleration = 25; // Deceleration rate (units per second squared)
+  maxSpeed = 2; // Maximum speed (units per second)
   keys = {}; // To track key states
 
   mouseStart = { x: 0, y: 0 };
@@ -35,6 +35,12 @@ export default class CameraManager extends Component {
       this.gameObject.transform.rotation.y,
       this.gameObject.transform.rotation.z
     );
+
+    this.coreCamera.fov = 75;
+    this.coreCamera.near = 0.01;
+    this.coreCamera.far = 100;
+
+    this.coreCamera.updateProjectionMatrix();
 
     document.addEventListener("keydown", (event) => {
       this.keys[event.key] = true;

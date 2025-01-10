@@ -9,11 +9,11 @@ export default {
   gameObjects: () => gameObjects,
 
   // Engine Lifecycle
-  initialize: function () {
+  initialize: async function () {
     core.addPreRenderHook(prerender);
     core.addPostRenderHook(postrender);
 
-    core.initialize();
+    await core.initialize();
 
     // Post initialization
     document

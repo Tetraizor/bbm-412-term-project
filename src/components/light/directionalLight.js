@@ -36,6 +36,12 @@ export default class DirectionalLight extends LightBase {
       this.gameObject.transform.rotation.z = (event.target.value * Math.PI) / 2;
     });
 
+    this.gameObject.transform.rotation = new THREE.Vector3(
+      (document.getElementById("lightX").value * Math.PI) / 2,
+      (document.getElementById("lightY").value * Math.PI) / 2,
+      (document.getElementById("lightZ").value * Math.PI) / 2
+    );
+
     core.scene.add(this.light);
   }
 

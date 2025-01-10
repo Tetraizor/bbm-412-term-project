@@ -51,6 +51,11 @@ export default class Renderer extends Component {
       this.gameObject.transform?.rotation.y,
       this.gameObject.transform?.rotation.z
     );
+    this.mesh.scale.set(
+      this.gameObject.transform?.scale.x,
+      this.gameObject.transform?.scale.y,
+      this.gameObject.transform?.scale.z
+    );
 
     if (core.directionalLight) {
       const lightDirection =
@@ -59,6 +64,8 @@ export default class Renderer extends Component {
       lightDirection.sub(core.directionalLight.transform.position);
 
       lightDirection.normalize();
+
+      this.updateUniform("time", core.time / 1000);
 
       this.updateUniform("lightDirection", lightDirection);
 

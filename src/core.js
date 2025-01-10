@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import WebGL from "three/addons/capabilities/WebGL.js";
+import resourceManager from "./resourceManager.js";
 
 export default {
   scene: null,
@@ -17,8 +18,8 @@ export default {
   fps: 0,
 
   // Initialization of the Three.js setup
-  initialize: function () {
-    this._initializeScene();
+  initialize: async function () {
+    await this._initializeScene();
     this._initializeCamera();
     this._initializeRenderer();
 
@@ -26,8 +27,22 @@ export default {
   },
 
   // Initialize the scene
-  _initializeScene: function () {
+  _initializeScene: async function () {
     this.scene = new THREE.Scene();
+    this.scene.background = new THREE.Color(0x1d7378);
+
+    const skyboxMaterial = await resourceManager.loadMaterial(
+      "skybox",
+      "./materials/skyboxV.glsl",
+      "./materials/skyboxF.glsl",
+      {}
+    );
+
+    skyboxMaterial.side = THREE.BackSide;
+
+    const skyboxGeometry = new THREE.SphereGeometry(80);
+    const skybox = new THREE.Mesh(skyboxGeometry, skyboxMaterial);
+    this.scene.add(skybox);
   },
 
   // Initialize the camera
