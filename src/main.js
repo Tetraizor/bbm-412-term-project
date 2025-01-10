@@ -132,8 +132,8 @@ async function createInitialScene() {
   engine.instantiate(spawner);
 
   const camera = new GameObject("Camera", [new CameraManager()], ["camera"]);
-  camera.transform.position = new Vector3(0, 3.3, 2);
-  camera.transform.rotation = new Vector3(-Math.PI / 4, 0, 0);
+  camera.transform.setPosition(new Vector3(0, 3.3, 2));
+  camera.transform.setRotation(new Vector3(-Math.PI / 4, 0, 0));
 
   engine.instantiate(camera);
 
@@ -143,11 +143,9 @@ async function createInitialScene() {
     ["directionalLight"]
   );
 
-  directionalLight.transform.position = new Vector3(3, 3, 3);
-  directionalLight.transform.rotation = new Vector3(
-    -Math.PI / 4,
-    0,
-    -Math.PI / 4
+  directionalLight.transform.setPosition(new Vector3(3, 3, 3));
+  directionalLight.transform.setRotation(
+    new Vector3(-Math.PI / 4, 0, -Math.PI / 4)
   );
 
   engine.instantiate(directionalLight);
@@ -207,17 +205,17 @@ async function createTemporarySceneObjects() {
     ["sea"]
   );
 
-  suzanne1.transform.position = new Vector3(2, 5, 0);
-  suzanne2.transform.position = new Vector3(-2, 5, 0);
-  table.transform.position = new Vector3(0, 0, 0);
-  island.transform.position = new Vector3(0, 0, 0);
-  sea.transform.position = new Vector3(0, -1, 0);
+  suzanne1.transform.setPosition(new Vector3(2, 5, 0));
+  suzanne2.transform.setPosition(new Vector3(-2, 5, 0));
+  table.transform.setPosition(new Vector3(0, 0, 0));
+  island.transform.setPosition(new Vector3(0, 0, 0));
+  sea.transform.setPosition(new Vector3(0, -1, 0));
 
-  suzanne1.transform.rotation = new Vector3(-Math.PI / 2, 0, 0);
-  suzanne2.transform.rotation = new Vector3(-Math.PI / 2, 0, 0);
-  table.transform.rotation = new Vector3(-Math.PI / 2, 0, 0);
-  island.transform.rotation = new Vector3(-Math.PI / 2, 0, 0);
-  sea.transform.rotation = new Vector3(-Math.PI / 2, 0, 0);
+  suzanne1.transform.setRotation(new Vector3(-Math.PI / 2, 0, 0));
+  suzanne2.transform.setRotation(new Vector3(-Math.PI / 2, 0, 0));
+  table.transform.setRotation(new Vector3(-Math.PI / 2, 0, 0));
+  island.transform.setRotation(new Vector3(-Math.PI / 2, 0, 0));
+  sea.transform.setRotation(new Vector3(-Math.PI / 2, 0, 0));
 
   engine.instantiate(suzanne1);
   engine.instantiate(suzanne2);
@@ -239,8 +237,8 @@ async function createTemporarySceneObjects() {
   plane.getComponent(Renderer).material.uniforms.baseColor.value =
     new THREE.Color(1, 1, 1);
 
-  plane.transform.position = new Vector3(0, 0, 0);
-  plane.transform.rotation = new Vector3(-(Math.PI / 2), 0, 0);
+  plane.transform.setPosition(new Vector3(0, 0, 0));
+  plane.transform.setRotation(new Vector3(-(Math.PI / 2), 0, 0));
 
   engine.instantiate(plane);
 
@@ -273,7 +271,7 @@ async function createTemporarySceneObjects() {
   core.ambientLight = ambientLight;
   core.directionalLight = directionalLight;
 
-  directionalLight.transform.position = new Vector3(0, 0, 0);
+  directionalLight.transform.setPosition(new Vector3(0, 0, 0));
 
   const debugTexture = resourceManager.getTexture("debugTexture");
   debugTexture.wrapS = THREE.RepeatWrapping;

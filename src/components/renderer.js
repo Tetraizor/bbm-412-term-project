@@ -38,41 +38,64 @@ export default class Renderer extends Component {
     }
   }
 
-  start() {}
+  onPositionChanged(position) {
+    this.mesh.position.set(position.x, position.y, position.z);
+  }
 
-  update() {
-    this.mesh.position.set(
-      this.gameObject.transform?.position.x,
-      this.gameObject.transform?.position.y,
-      this.gameObject.transform?.position.z
-    );
-    this.mesh.rotation.set(
-      this.gameObject.transform?.rotation.x,
-      this.gameObject.transform?.rotation.y,
-      this.gameObject.transform?.rotation.z
-    );
-    this.mesh.scale.set(
-      this.gameObject.transform?.scale.x,
-      this.gameObject.transform?.scale.y,
-      this.gameObject.transform?.scale.z
+  onRotationChanged(rotation) {
+    this.mesh.rotation.set(rotation.x, rotation.y, rotation.z);
+  }
+
+  onScaleChanged(scale) {
+    this.mesh.scale.set(scale.x, scale.y, scale.z);
+  }
+
+  start() {
+    this.gameObject.transform.addListener("onPositionChanged", (event) => {
+      this.onPositionChanged(event.detail.position);
+    });
+
+    this.gameObject.transform.addListener("onRotationChanged", (event) => {
+      this.onRotationChanged(event.detail.rotation);
+    });
+
+    this.gameObject.transform.addListener("onScaleChanged", (event) => {
+      this.onScaleChanged(event.detail.scale);
+    });
+
+    this.onPositionChanged(this.gameObject.transform.position);
+    this.onRotationChanged(this.gameObject.transform.rotation);
+    this.onScaleChanged(this.gameObject.transform.scale);
+
+    core.directionalLight.transform.addListener(
+      "onPositionChanged",
+      (event) => {
+        this.onLightPropertyChanged();
+      }
     );
 
+    core.ambientLight.transform.addListener("onPositionChanged", (event) => {
+      this.onLightPropertyChanged();
+    });
+
+    this.onLightPropertyChanged();
+  }
+
+  onLightPropertyChanged() {
     if (core.directionalLight) {
-      const lightDirection =
-        core.directionalLight.getComponent(DirectionalLight).light.target
-          .position;
-      lightDirection.sub(core.directionalLight.transform.position);
+      const directionalLight =
+        core.directionalLight.getComponent(DirectionalLight).light;
+      const lightDirection = directionalLight.target.position;
 
+      lightDirection.sub(core.directionalLight.transform.position);
       lightDirection.normalize();
 
-      this.updateUniform("time", core.time / 1000);
-
       this.updateUniform("lightDirection", lightDirection);
-
       this.updateUniform(
         "lightColor",
         core.directionalLight.getComponent(DirectionalLight).light.color
       );
+
       this.updateUniform(
         "lightIntensity",
         core.directionalLight.getComponent(DirectionalLight).light.intensity
@@ -80,17 +103,21 @@ export default class Renderer extends Component {
     }
 
     if (core.ambientLight) {
-      this.updateUniform(
-        "ambientColor",
-        core.ambientLight.getComponent(AmbientLight).light.color
-      );
-      this.updateUniform(
-        "ambientIntensity",
-        core.ambientLight.getComponent(AmbientLight).light.intensity
-      );
+      if (core.ambientLight) {
+        this.updateUniform(
+          "ambientColor",
+          core.ambientLight.getComponent(AmbientLight).light.color
+        );
+        this.updateUniform(
+          "ambientIntensity",
+          core.ambientLight.getComponent(AmbientLight).light.intensity
+        );
+      }
     }
+  }
 
-    this.material.needsUpdate = true;
+  update() {
+    this.updateUniform("time", core.time / 1000);
   }
 
   updateUniform(name, value) {

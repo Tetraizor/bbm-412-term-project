@@ -27,26 +27,26 @@ export default class GizmoRenderer extends Component {
     );
 
     core.scene.add(this.arrow);
+
+    this.gameObject.transform.addListener("onPositionChanged", (event) => {
+      this.arrow.position.set(
+        event.detail.position.x,
+        event.detail.position.y,
+        event.detail.position.z
+      );
+    });
+
+    this.gameObject.transform.addListener("onRotationChanged", (event) => {
+      this.arrow.rotation.set(
+        event.detail.rotation.x,
+        event.detail.rotation.y,
+        event.detail.rotation.z
+      );
+    });
   }
 
   update() {
     super.update();
-
-    // this.gameObject.transform.rotation.z += 0.01;
-    // this.gameObject.transform.rotation.x += (core.deltaTime / 1000) * Math.PI;
-    // this.gameObject.transform.rotation.y += (core.deltaTime / 1000) * Math.PI;
-
-    this.arrow.rotation.set(
-      this.gameObject.transform.rotation.x,
-      this.gameObject.transform.rotation.y,
-      this.gameObject.transform.rotation.z
-    );
-
-    this.arrow.position.set(
-      this.gameObject.transform.position.x,
-      this.gameObject.transform.position.y,
-      this.gameObject.transform.position.z
-    );
   }
 
   destroy() {

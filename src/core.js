@@ -1,14 +1,20 @@
 import * as THREE from "three";
+import * as CANNON from "cannon-es";
 import WebGL from "three/addons/capabilities/WebGL.js";
 import resourceManager from "./resourceManager.js";
 
 export default {
+  // THREE.js
   scene: null,
   camera: null,
   renderer: null,
   directionalLight: null,
   ambientLight: null,
 
+  // CANNON.js
+  world: null,
+
+  // Game Engine
   prerenderHooks: [],
   postrenderHooks: [],
 
@@ -28,6 +34,7 @@ export default {
 
   // Initialize the scene
   _initializeScene: async function () {
+    // Renderer
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x1d7378);
 
@@ -43,6 +50,10 @@ export default {
     const skyboxGeometry = new THREE.SphereGeometry(80);
     const skybox = new THREE.Mesh(skyboxGeometry, skyboxMaterial);
     this.scene.add(skybox);
+
+    // Physics
+    this.world = new CANNON.World();
+    this.world.gravity.set(0, -9.82, 0);
   },
 
   // Initialize the camera
