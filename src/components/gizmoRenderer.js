@@ -16,7 +16,7 @@ export default class GizmoRenderer extends Component {
 
   arrow = null;
   plane = null;
-  cube = null;
+  box = null;
 
   constructor(gizmo) {
     super();
@@ -146,16 +146,16 @@ export default class GizmoRenderer extends Component {
     this.gameObject.transform.setScale();
   }
 
-  createCube() {
-    this.cube = new THREE.Mesh(
-      new THREE.BoxGeometry(this.length, this.width, this.height),
+  createBox() {
+    this.box = new THREE.Mesh(
+      new THREE.BoxGeometry(this.width, this.height, this.length),
       new THREE.MeshBasicMaterial({ color: this.color, wireframe: true })
     );
 
-    core.scene.add(this.cube);
+    core.scene.add(this.box);
 
     this.gameObject.transform.addListener("onPositionChanged", (event) => {
-      this.cube.position.set(
+      this.box.position.set(
         event.detail.position.x,
         event.detail.position.y,
         event.detail.position.z
@@ -163,7 +163,7 @@ export default class GizmoRenderer extends Component {
     });
 
     this.gameObject.transform.addListener("onRotationChanged", (event) => {
-      this.cube.rotation.set(
+      this.box.rotation.set(
         event.detail.rotation.x,
         event.detail.rotation.y,
         event.detail.rotation.z
@@ -171,7 +171,7 @@ export default class GizmoRenderer extends Component {
     });
 
     this.gameObject.transform.addListener("onScaleChanged", (event) => {
-      this.cube.scale.set(
+      this.box.scale.set(
         event.detail.scale.x,
         event.detail.scale.y,
         event.detail.scale.z
@@ -193,8 +193,8 @@ export default class GizmoRenderer extends Component {
       case "plane":
         this.createPlane();
         break;
-      case "cube":
-        this.createCube();
+      case "box":
+        this.createBox();
         break;
       case "sphere":
         this.createSphere();

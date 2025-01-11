@@ -171,6 +171,7 @@ async function createTemporarySceneObjects() {
       new PhysicsBody({
         mass: 1,
         shape: { type: "sphere", radius: 1 },
+        showGizmo: true,
       }),
     ],
     ["suzanne"]
@@ -184,6 +185,7 @@ async function createTemporarySceneObjects() {
       new PhysicsBody({
         mass: 1,
         shape: { type: "sphere", radius: 1 },
+        showGizmo: true,
       }),
     ],
     ["suzanne"]
@@ -243,7 +245,7 @@ async function createTemporarySceneObjects() {
     "Plane",
     [
       new Renderer(
-        new THREE.BoxGeometry(3 / 2, 0.1, 3 / 2),
+        new THREE.BoxGeometry(3 / 2, 0.1 / 2, 3 / 2),
         resourceManager.getMaterial("lambertian")
       ),
       new PhysicsBody({
@@ -254,6 +256,7 @@ async function createTemporarySceneObjects() {
           height: 0.1,
           depth: 3,
         },
+        showGizmo: true,
       }),
     ],
     ["plane"]

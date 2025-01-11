@@ -9,17 +9,13 @@ export default class PhysicsBody extends Component {
   body = null;
   shape = null;
   shapeWrapper = null;
+  showGizmo = false;
 
   constructor({ mass = 0, shape = null, showGizmo = false }) {
     super();
 
     this.mass = mass;
-
-    if (showGizmo) {
-      const gizmo = new GizmoRenderer(0x00ff00, 1);
-      this.gameObject.addComponent(gizmo);
-    }
-
+    this.showGizmo = showGizmo;
     this.shapeWrapper = shape;
 
     switch (shape.type) {
@@ -50,34 +46,40 @@ export default class PhysicsBody extends Component {
   start() {
     switch (this.shapeWrapper.type) {
       case "box":
-        this.gameObject.addComponent(
-          new GizmoRenderer({
-            color: 0x00ff00,
-            type: "box",
-            width: this.shape.halfExtents.x * 2,
-            height: this.shape.halfExtents.y * 2,
-            depth: this.shape.halfExtents.z * 2,
-          })
-        );
+        if (this.showGizmo) {
+          this.gameObject.addComponent(
+            new GizmoRenderer({
+              color: 0x00ff00,
+              type: "box",
+              width: this.shapeWrapper.width / 2,
+              height: this.shapeWrapper.height / 2,
+              length: this.shapeWrapper.depth / 2,
+            })
+          );
+        }
         break;
       case "sphere":
-        this.gameObject.addComponent(
-          new GizmoRenderer({
-            color: 0x00ff00,
-            type: "sphere",
-            radius: this.shape.radius,
-          })
-        );
+        if (this.showGizmo) {
+          this.gameObject.addComponent(
+            new GizmoRenderer({
+              color: 0x00ff00,
+              type: "sphere",
+              radius: this.shape.radius,
+            })
+          );
+        }
         break;
       case "plane":
-        this.gameObject.addComponent(
-          new GizmoRenderer({
-            color: 0x00ff00,
-            type: "plane",
-            width: 1,
-            height: 1,
-          })
-        );
+        if (this.showGizmo) {
+          this.gameObject.addComponent(
+            new GizmoRenderer({
+              color: 0x00ff00,
+              type: "plane",
+              width: 1,
+              height: 1,
+            })
+          );
+        }
         break;
     }
 
