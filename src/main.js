@@ -3,6 +3,7 @@ import core from "./core.js";
 
 import { Vector3 } from "three";
 import * as THREE from "three";
+import * as CANNON from "cannon-es";
 
 import GameObject from "./gameObject.js";
 import Renderer from "./components/renderer.js";
@@ -10,6 +11,7 @@ import ObjectSpawner from "./components/objectSpawner.js";
 import CameraManager from "./components/cameraManager.js";
 import AmbientLight from "./components/light/ambientLight.js";
 import DirectionalLight from "./components/light/directionalLight.js";
+import PhysicsBody from "./components/physicsBody.js";
 
 import Suzanne from "./behaviours/suzanne.js";
 import resourceManager from "./resourceManager.js";
@@ -132,8 +134,8 @@ async function createInitialScene() {
   engine.instantiate(spawner);
 
   const camera = new GameObject("Camera", [new CameraManager()], ["camera"]);
-  camera.transform.setPosition(new Vector3(0, 3.3, 2));
-  camera.transform.setRotation(new Vector3(-Math.PI / 4, 0, 0));
+  camera.transform.setPosition(new Vector3(0, 6, 7));
+  camera.transform.setRotation(new Vector3(-Math.PI / 6, 0, 0));
 
   engine.instantiate(camera);
 
@@ -163,13 +165,27 @@ async function createTemporarySceneObjects() {
 
   const suzanne1 = new GameObject(
     "Suzanne1",
-    [new Renderer(suzanneModel, lambertianMaterial), new Suzanne()],
+    [
+      new Renderer(suzanneModel, lambertianMaterial),
+      new Suzanne(),
+      new PhysicsBody({
+        mass: 1,
+        shape: { type: "sphere", radius: 1 },
+      }),
+    ],
     ["suzanne"]
   );
 
   const suzanne2 = new GameObject(
     "Suzanne2",
-    [new Renderer(suzanneModel, toonMaterial), new Suzanne()],
+    [
+      new Renderer(suzanneModel, toonMaterial),
+      new Suzanne(),
+      new PhysicsBody({
+        mass: 1,
+        shape: { type: "sphere", radius: 1 },
+      }),
+    ],
     ["suzanne"]
   );
 
@@ -205,8 +221,8 @@ async function createTemporarySceneObjects() {
     ["sea"]
   );
 
-  suzanne1.transform.setPosition(new Vector3(2, 5, 0));
-  suzanne2.transform.setPosition(new Vector3(-2, 5, 0));
+  suzanne1.transform.setPosition(new Vector3(3, 30, 0));
+  suzanne2.transform.setPosition(new Vector3(-3, 5, 0));
   table.transform.setPosition(new Vector3(0, 0, 0));
   island.transform.setPosition(new Vector3(0, 0, 0));
   sea.transform.setPosition(new Vector3(0, -1, 0));
@@ -227,9 +243,18 @@ async function createTemporarySceneObjects() {
     "Plane",
     [
       new Renderer(
-        new THREE.PlaneGeometry(4, 4),
+        new THREE.BoxGeometry(3 / 2, 0.1, 3 / 2),
         resourceManager.getMaterial("lambertian")
       ),
+      new PhysicsBody({
+        mass: 0,
+        shape: {
+          type: "box",
+          width: 3,
+          height: 0.1,
+          depth: 3,
+        },
+      }),
     ],
     ["plane"]
   );
@@ -237,8 +262,9 @@ async function createTemporarySceneObjects() {
   plane.getComponent(Renderer).material.uniforms.baseColor.value =
     new THREE.Color(1, 1, 1);
 
-  plane.transform.setPosition(new Vector3(0, 0, 0));
-  plane.transform.setRotation(new Vector3(-(Math.PI / 2), 0, 0));
+  plane.transform.setPosition(new Vector3(0, 2, 0));
+  plane.transform.setRotation(new Vector3(Math.PI / 6, Math.PI / 6, 0));
+  plane.transform.setScale(new Vector3(4, 4, 4));
 
   engine.instantiate(plane);
 
@@ -260,7 +286,7 @@ async function createTemporarySceneObjects() {
         color: new THREE.Color(1, 1, 1),
         intensity: 1,
       }),
-      new GizmoRenderer(),
+      new GizmoRenderer({ type: "arrow", length: 1, color: 0xff0000 }),
     ],
     ["directionalLight"]
   );

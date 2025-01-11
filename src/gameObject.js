@@ -26,6 +26,14 @@ export default class GameObject {
     return this.components.find((component) => component instanceof type);
   }
 
+  addComponent(component) {
+    component.gameObject = this;
+    this.components.push(component);
+
+    component.start();
+    return component;
+  }
+
   destroy() {
     this.components.forEach((component) => {
       if (component.isComponent) {

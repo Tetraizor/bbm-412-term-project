@@ -112,6 +112,7 @@ export default {
         this.lastTime = this.time;
 
         this._runPreRenderHooks();
+        this.world.fixedStep(this.deltaTime / 1000);
         this.renderer.render(this.scene, this.camera);
         this._runPostRenderHooks();
 

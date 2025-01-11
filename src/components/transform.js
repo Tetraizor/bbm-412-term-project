@@ -32,31 +32,46 @@ export default class Transform extends Component {
     this.eventListeners.push({ event, callback });
   }
 
-  setPosition(position) {
+  setPosition(position, source = null) {
+    if (position == null || position == undefined) position = this.position;
+
     this.position = position;
 
     const event = new CustomEvent("onPositionChanged", {
-      detail: { position: this.position },
+      detail: {
+        position: this.position,
+        source: source,
+      },
     });
 
     this.eventTarget.dispatchEvent(event);
   }
 
-  setRotation(rotation) {
+  setRotation(rotation, source = null) {
+    if (rotation == null || rotation == undefined) rotation = this.rotation;
+
     this.rotation = rotation;
 
     const event = new CustomEvent("onRotationChanged", {
-      detail: { rotation: this.rotation },
+      detail: {
+        rotation: this.rotation,
+        source: source,
+      },
     });
 
     this.eventTarget.dispatchEvent(event);
   }
 
-  setScale(scale) {
+  setScale(scale, source = null) {
+    if (scale == null || scale == undefined) scale = this.scale;
+
     this.scale = scale;
 
     const event = new CustomEvent("onScaleChanged", {
-      detail: { scale: this.scale },
+      detail: {
+        scale: this.scale,
+        source: source,
+      },
     });
 
     this.eventTarget.dispatchEvent(event);
