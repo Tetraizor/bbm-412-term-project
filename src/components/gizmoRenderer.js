@@ -148,7 +148,7 @@ export default class GizmoRenderer extends Component {
 
   createBox() {
     this.box = new THREE.Mesh(
-      new THREE.BoxGeometry(this.width, this.height, this.length),
+      new THREE.BoxGeometry(this.width, this.height, this.length, 4, 4, 4),
       new THREE.MeshBasicMaterial({ color: this.color, wireframe: true })
     );
 

@@ -3,6 +3,7 @@ import * as CANNON from "cannon-es";
 import { Vector3, Euler, Quaternion } from "three";
 import core from "../core.js";
 import GizmoRenderer from "./gizmoRenderer.js";
+import { getRandomHexColor } from "../utils/colorUtils.js";
 
 export default class PhysicsBody extends Component {
   mass = 0;
@@ -49,7 +50,7 @@ export default class PhysicsBody extends Component {
         if (this.showGizmo) {
           this.gameObject.addComponent(
             new GizmoRenderer({
-              color: 0x00ff00,
+              color: getRandomHexColor(),
               type: "box",
               width: this.shapeWrapper.width / 2,
               height: this.shapeWrapper.height / 2,
@@ -62,7 +63,7 @@ export default class PhysicsBody extends Component {
         if (this.showGizmo) {
           this.gameObject.addComponent(
             new GizmoRenderer({
-              color: 0x00ff00,
+              color: getRandomHexColor(),
               type: "sphere",
               radius: this.shape.radius,
             })
@@ -73,7 +74,7 @@ export default class PhysicsBody extends Component {
         if (this.showGizmo) {
           this.gameObject.addComponent(
             new GizmoRenderer({
-              color: 0x00ff00,
+              color: getRandomHexColor(),
               type: "plane",
               width: 1,
               height: 1,
