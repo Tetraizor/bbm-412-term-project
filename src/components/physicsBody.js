@@ -52,9 +52,9 @@ export default class PhysicsBody extends Component {
             new GizmoRenderer({
               color: getRandomHexColor(),
               type: "box",
-              width: this.shapeWrapper.width / 2,
-              height: this.shapeWrapper.height / 2,
-              length: this.shapeWrapper.depth / 2,
+              width: this.shapeWrapper.width * 2,
+              height: this.shapeWrapper.height * 2,
+              length: this.shapeWrapper.depth * 2,
             })
           );
         }
@@ -118,8 +118,6 @@ export default class PhysicsBody extends Component {
   }
 
   update() {
-    this.body.velocity.set(1, this.body.velocity.y, this.body.velocity.z);
-
     this.gameObject.transform.setPosition(
       new Vector3(
         this.body.position.x,

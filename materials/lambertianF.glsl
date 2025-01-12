@@ -6,7 +6,7 @@ uniform float lightIntensity;
 uniform vec3 ambientColor;
 uniform float ambientIntensity;
 
-uniform vec3 baseColor;
+uniform vec4 baseColor;
 
 varying vec3 vNormal;
 varying vec3 vPosition;
@@ -23,10 +23,10 @@ void main() {
     float fogFactor = exp(-.1 * vFogDistance);
     fogFactor = clamp(fogFactor, 0.0, 1.0);
 
-    vec3 shadedColor = ambientColor * ambientIntensity + 
-                lambertianFactor * lightColor * lightIntensity;
+    vec4 shadedColor = vec4(ambientColor * ambientIntensity + 
+                lambertianFactor * lightColor * lightIntensity, 1.0);
     
-    vec3 finalColor = mix(baseColor * shadedColor, vec3(0.0, 0.0, 0.0), 1.0 - fogFactor);
+    vec4 finalColor = mix(baseColor * shadedColor, vec4(0.0, 0.0, 0.0, 1.0), 1.0 - fogFactor);
 
-    gl_FragColor = vec4( finalColor, 1.0);
+    gl_FragColor =  finalColor;
 }

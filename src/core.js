@@ -2,6 +2,7 @@ import * as THREE from "three";
 import * as CANNON from "cannon-es";
 import WebGL from "three/addons/capabilities/WebGL.js";
 import resourceManager from "./resourceManager.js";
+import InputManager from "./inputManager.js";
 
 export default {
   // THREE.js
@@ -22,6 +23,9 @@ export default {
   lastTime: 0,
   deltaTime: 0,
   fps: 0,
+
+  // Utils
+  inputManager: new InputManager(),
 
   // Initialization of the Three.js setup
   initialize: async function () {

@@ -9,6 +9,8 @@ uniform float ambientIntensity;
 uniform vec3 baseColor;
 uniform sampler2D baseTexture;
 
+uniform float opacity;
+
 varying vec3 vNormal;
 varying vec3 vPosition;
 varying vec2 vUv;
@@ -21,11 +23,11 @@ void main() {
 
     vec3 toonFactor;
 
-    if (diffuse > .8) {
+    if (diffuse > .6) {
         toonFactor = lightColor * lightIntensity;
-    } else if (diffuse > .6) {
+    } else if (diffuse > .2) {
         toonFactor =  lightColor * lightIntensity * 0.5;
-    } else if (diffuse > .3) {
+    } else if (diffuse > .001) {
         toonFactor = lightColor * lightIntensity * 0.2;
     }else {
         toonFactor = lightColor * lightIntensity * 0.1;
@@ -33,12 +35,12 @@ void main() {
 
     vec3 shadedColor = toonFactor + ambientColor * ambientIntensity;
     vec4 textureColor = texture2D(baseTexture, vUv);
-    vec3 finalColor = shadedColor * textureColor.xyz;
+    vec4 finalColor = vec4(shadedColor, 1.0) * textureColor * vec4(baseColor.xyz, opacity);
 
-    float fogFactor = exp(-.08 * vFogDistance);
+    float fogFactor = exp(-.02 * vFogDistance);
     fogFactor = clamp(fogFactor, 0.0, 1.0);
 
-    finalColor = mix(finalColor, vec3(0.15, 0.51, 0.52), 1.0 - fogFactor);
+    finalColor = mix(finalColor, vec4(0.15, 0.51, 0.52, 1.0), 1.0 - fogFactor);
 
-    gl_FragColor = vec4(finalColor, 1.0);
+    gl_FragColor = finalColor;
 }

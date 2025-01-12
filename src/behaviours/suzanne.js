@@ -9,22 +9,7 @@ export default class Suzanne extends Component {
     super();
   }
 
-  start() {
-    document.getElementById("webgl").addEventListener("mousedown", (event) => {
-      if (event.button == 0) {
-        if (this.speed == 0) {
-          this.speed = this.speed + 0.001;
-        } else {
-          this.speed *= -1;
-        }
-      } else if (event.button == 2) {
-        this.speed = 0;
-      } else if (event.button == 1) {
-        this.speed = 0;
-        this.gameObject.transform.setRotation(new Vector3(Math.PI / -2, 0, 0));
-      }
-    });
-  }
+  start() {}
 
   update() {
     this.gameObject.transform.setRotation(

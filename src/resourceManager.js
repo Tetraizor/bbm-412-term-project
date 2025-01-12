@@ -19,6 +19,7 @@ export default {
       uniforms: uniforms,
       vertexShader: vertexSrc,
       fragmentShader: fragmentSrc,
+      transparent: true,
     });
 
     this.materials.push({
