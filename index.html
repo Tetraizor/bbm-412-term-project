@@ -84,6 +84,39 @@
         </div>
       </div>
     </div>
+    <!-- Toggle Sidebar Button -->
+    <button id="toggleSidebar" class="toggle-button">☰</button>
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar hidden">
+      <div class="sidebar-header">
+        <h2>Categories</h2>
+      </div>
+      <div class="sidebar-categories">
+        <button class="category-tab" data-category="category1">Category 1</button>
+        <button class="category-tab" data-category="category2">Category 2</button>
+        <button class="category-tab" data-category="category3">Category 3</button>
+      </div>
+      <div id="sidebar-content" class="sidebar-content">
+        <!-- Default content or Category 1 buttons -->
+        <div class="category-content" id="category1">
+          <button id="createEnergySphereButton">Create Energy Sphere</button>
+          <button>Button 2</button>
+          <button>Button 3</button>
+        </div>
+        <div class="category-content hidden" id="category2">
+          <button>Button A</button>
+          <button>Button B</button>
+          <button>Button C</button>
+        </div>
+        <div class="category-content hidden" id="category3">
+          <button>Option X</button>
+          <button>Option Y</button>
+          <button>Option Z</button>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="src/sidebar.js"></script>
     <script type="module" src="src/main.js"></script>
   </body>
 </html>

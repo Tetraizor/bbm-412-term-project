@@ -118,3 +118,107 @@ canvas {
   margin: 10px 0;
   border-bottom: 1px solid black;
 }
+
+/* Sidebar Toggle Button */
+.toggle-button {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #1a1a2e;
+  color: #fff;
+  font-size: 1.5rem;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  border-radius: 5px;
+  z-index: 1001;
+  transition: background-color 0.3s ease;
+}
+
+.toggle-button:hover {
+  background-color: #162447;
+}
+
+/* Sidebar */
+.sidebar {
+  position: fixed;
+  right: -300px;
+  top: 0;
+  width: 300px;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  transition: right 0.3s ease;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar.visible {
+  right: 0;
+}
+
+.sidebar-header {
+  text-align: center;
+  padding: 15px;
+  font-size: 1.5rem;
+  border-bottom: 1px solid #444;
+}
+
+.sidebar-categories {
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0;
+  border-bottom: 1px solid #444;
+}
+
+.category-tab {
+  background: #1a1a2e;
+  color: #fff;
+  border: none;
+  padding: 10px 15px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.category-tab:hover {
+  background-color: #162447;
+}
+
+.sidebar-content {
+  padding: 15px;
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.category-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.category-content.hidden {
+  display: none;
+}
+
+.category-content button {
+  margin: 10px 0;
+  padding: 10px;
+  background-color: #323cf5;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.category-content button:hover {
+  background-color: #323cf5;
+}
+
+/* Highlight the active category tab */
+.category-tab.active {
+  background-color: #323cf5; /* Color for the active tab */
+  font-weight: bold;
+}
+

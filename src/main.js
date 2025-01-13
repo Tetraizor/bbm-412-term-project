@@ -424,3 +424,5 @@ async function createEnergySphere() {
 }
 
 await start();
+
+export { createEnergySphere };
