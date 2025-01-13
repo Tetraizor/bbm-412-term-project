@@ -1,5 +1,7 @@
 varying vec3 vPosition;
 
+out vec4 fragColor;
+
 void main() {
     float t = (vPosition.y + 1.0) / 30.0;
 
@@ -8,5 +10,5 @@ void main() {
 
     vec3 gradientColor = mix(colorBottom, colorTop, t);
 
-    gl_FragColor = vec4(gradientColor, 1.0);
+    fragColor = vec4(gradientColor, 1.0);
 }

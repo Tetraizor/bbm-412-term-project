@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import * as CANNON from "cannon-es";
 import WebGL from "three/addons/capabilities/WebGL.js";
-import resourceManager from "./resourceManager.js";
+import ResourceManager from "./resourceManager.js";
 import InputManager from "./inputManager.js";
 
 export default {
@@ -18,6 +18,8 @@ export default {
   // Game Engine
   prerenderHooks: [],
   postrenderHooks: [],
+
+  debugMode: true,
 
   time: 0,
   lastTime: 0,
@@ -42,7 +44,7 @@ export default {
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x1d7378);
 
-    const skyboxMaterial = await resourceManager.loadMaterial(
+    const skyboxMaterial = await ResourceManager.loadMaterial(
       "skybox",
       "./materials/skyboxV.glsl",
       "./materials/skyboxF.glsl",
@@ -73,16 +75,16 @@ export default {
 
   // Initialize the renderer
   _initializeRenderer: function () {
-    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    const canvas = document.getElementById("webgl");
+    const context = canvas.getContext("webgl2");
+
+    this.renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      canvas: canvas,
+      context: context,
+    });
+
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-
-    const container = document.getElementById("webgl");
-
-    if (container) {
-      container.appendChild(this.renderer.domElement);
-    } else {
-      console.error('Cannot find element with id "webgl"');
-    }
 
     window.addEventListener("resize", () => {
       this.renderer.setSize(window.innerWidth, window.innerHeight);

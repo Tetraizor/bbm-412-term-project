@@ -18,7 +18,7 @@ export default class InputManager {
             callback({
               clientX: event.clientX,
               clientY: event.clientY,
-              clickId: event.target.id,
+              clickId: event.button,
             });
           });
         break;
@@ -29,7 +29,7 @@ export default class InputManager {
             callback({
               clientX: event.clientX,
               clientY: event.clientY,
-              clickId: event.target.id,
+              clickId: event.button,
             });
           });
         break;

@@ -181,6 +181,14 @@ export default class CameraManager extends Component {
       this.gameObject.transform.position.y,
       this.gameObject.transform.position.z
     );
+
+    this.gameObject.transform.setRotation(
+      new Vector3(
+        this.coreCamera.rotation.x,
+        this.coreCamera.rotation.y,
+        this.coreCamera.rotation.z
+      )
+    );
   }
 
   projectVector(velocity, forward) {

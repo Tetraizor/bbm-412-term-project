@@ -2,9 +2,11 @@ import Component from "./component.js";
 import Renderer from "./renderer.js";
 import core from "../core.js";
 import { Vector3 } from "three";
+import PhysicsBody from "./physicsBody.js";
 
 export default class EnergySphere extends Component {
   shell = null;
+  physicsBody = null;
 
   constructor({ shell }) {
     super();
@@ -16,6 +18,9 @@ export default class EnergySphere extends Component {
     this.gameObject.transform.addListener("onPositionChanged", (event) => {
       this.shell.transform.setPosition(event.detail.position);
     });
+
+    this.physicsBody = this.gameObject.getComponent(PhysicsBody);
+    this.physicsBody.body.velocity.z = -0.5;
   }
 
   update() {

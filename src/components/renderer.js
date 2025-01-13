@@ -4,12 +4,17 @@ import core from "../core.js";
 import engine from "../engine.js";
 import AmbientLight from "./light/ambientLight.js";
 import DirectionalLight from "./light/directionalLight.js";
+import ResourceManager from "../resourceManager.js";
 
 export default class Renderer extends Component {
   mesh = null;
   material = null;
+  outlineMesh = null;
 
-  constructor(model, material) {
+  OUTLINE_THICKNESS = 1.01;
+  outlineOverride = 1;
+
+  constructor(model, material, outlineOverride = 1) {
     super();
 
     if (!model || !material) {
@@ -17,6 +22,7 @@ export default class Renderer extends Component {
     }
 
     this.material = material;
+    this.outlineOverride = outlineOverride;
 
     if (model.isObject3D) {
       this.mesh = new THREE.Mesh(model.geometry, this.material);
@@ -32,17 +38,39 @@ export default class Renderer extends Component {
 
   onPositionChanged(position) {
     this.mesh.position.set(position.x, position.y, position.z);
+    this.outlineMesh?.position.set(position.x, position.y, position.z);
   }
 
   onRotationChanged(rotation) {
     this.mesh.rotation.set(rotation.x, rotation.y, rotation.z);
+    this.outlineMesh?.rotation.set(rotation.x, rotation.y, rotation.z);
   }
 
   onScaleChanged(scale) {
     this.mesh.scale.set(scale.x, scale.y, scale.z);
+    this.outlineMesh.scale.set(scale.x, scale.y, scale.z);
+    this.outlineMesh?.scale.multiplyScalar(
+      this.OUTLINE_THICKNESS * this.outlineOverride
+    );
   }
 
   start() {
+    // Add outline shader
+    const outlineMaterial = ResourceManager.getMaterial("outline", true);
+    outlineMaterial.side = THREE.BackSide;
+    outlineMaterial.uniforms.outlineThickness.value =
+      1 - this.OUTLINE_THICKNESS * this.outlineOverride;
+
+    const outlineMesh = new THREE.Mesh(this.mesh.geometry, outlineMaterial);
+
+    outlineMesh.position.copy(this.mesh.position);
+    outlineMesh.rotation.copy(this.mesh.rotation);
+    outlineMesh.scale.copy(this.mesh.scale);
+
+    this.outlineMesh = outlineMesh;
+
+    core.createMesh(outlineMesh);
+
     this.gameObject.transform.addListener("onPositionChanged", (event) => {
       this.onPositionChanged(event.detail.position);
     });

@@ -1,7 +1,8 @@
 import Component from "./component.js";
 import * as THREE from "three";
 import core from "../core.js";
-import resourceManager from "../resourceManager.js";
+import ResourceManager from "../resourceManager.js";
+import ObjectSpawner from "./objectSpawner.js";
 
 export default class Raycast extends Component {
   raycaster = new THREE.Raycaster();
@@ -9,28 +10,33 @@ export default class Raycast extends Component {
   camera = null;
   objects = [];
 
+  objectSpawner = null;
+
   cursorPosition = new THREE.Vector3();
 
   cursor = null;
 
-  constructor({ camera, objects }) {
+  constructor({ camera, objects, objectSpawner }) {
     super();
 
     this.camera = camera;
     this.objects = objects;
+    this.objectSpawner = objectSpawner;
   }
 
   start() {
     const cursorGeometry =
-      resourceManager.getModel("cursor").children[0].geometry;
+      ResourceManager.getModel("cursor").children[0].geometry;
+
     const cursorMaterial = new THREE.MeshBasicMaterial({
-      opacity: 0.5,
-      color: 0x999999,
+      opacity: 0.9,
+      color: 0xddcccc,
+      transparent: true,
+      depthWrite: false,
     });
 
-    cursorGeometry.renderOrder = 999;
-
     this.cursor = new THREE.Mesh(cursorGeometry, cursorMaterial);
+    this.cursor.renderOrder = 999;
     this.cursor.position.set(0, 0, 0);
     this.cursor.rotation.set(-Math.PI / 2, 0, 0);
     this.cursor.scale.set(0.25, 0.25, 1);
@@ -40,6 +46,24 @@ export default class Raycast extends Component {
       this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
       this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
     });
+
+    core.inputManager.addListener("mouseDown", (event) => {
+      if (event.clickId === 0) {
+        const targetPosition = this.cursorPosition.clone();
+        targetPosition.y = 0.1;
+
+        this.attemptSpawnObject({
+          position: targetPosition,
+          object: "magnet",
+        });
+      }
+    });
+  }
+
+  attemptSpawnObject({ position, object }) {
+    this.objectSpawner
+      .getComponent(ObjectSpawner)
+      .spawnObject(position, object);
   }
 
   update() {

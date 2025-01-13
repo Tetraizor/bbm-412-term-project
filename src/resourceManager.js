@@ -20,6 +20,7 @@ export default {
       vertexShader: vertexSrc,
       fragmentShader: fragmentSrc,
       transparent: true,
+      glslVersion: THREE.GLSL3,
     });
 
     this.materials.push({
@@ -83,10 +84,15 @@ export default {
     return this.models.find((model) => model.name === modelName)?.model;
   },
 
-  getMaterial: function (materialName) {
-    return this.materials
-      .find((material) => material.name === materialName)
-      ?.material.clone();
+  getMaterial: function (materialName, getNewCopy = true) {
+    if (getNewCopy) {
+      return this.materials
+        .find((material) => material.name === materialName)
+        ?.material.clone();
+    } else {
+      return this.materials.find((material) => material.name === materialName)
+        ?.material;
+    }
   },
 
   getTexture: function (textureName) {

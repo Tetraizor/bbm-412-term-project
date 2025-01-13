@@ -13,13 +13,10 @@ import AmbientLight from "./components/light/ambientLight.js";
 import DirectionalLight from "./components/light/directionalLight.js";
 import PhysicsBody from "./components/physicsBody.js";
 
-import Suzanne from "./behaviours/suzanne.js";
-import resourceManager from "./resourceManager.js";
-import GizmoRenderer from "./components/gizmoRenderer.js";
+import ResourceManager from "./resourceManager.js";
 import UIManager from "./uiManager.js";
 import Raycast from "./components/raycast.js";
 import Airship from "./components/airship.js";
-import EnergySphere from "./components/energySphere.js";
 
 const uiManager = new UIManager();
 
@@ -66,24 +63,24 @@ async function initializeEngine() {
 
 async function loadResources() {
   // Load textures.
-  await resourceManager.loadTexture(
+  await ResourceManager.loadTexture(
     "debugTexture",
     "../textures/debug/texture_09.png"
   );
-  await resourceManager.loadTexture("cursor", "../textures/cursor.png");
-
-  await resourceManager.loadTexture("tableTexture", "../textures/table.png");
-  await resourceManager.loadTexture("whiteTexture", "../textures/white.png");
+  await ResourceManager.loadTexture("cursor", "../textures/cursor.png");
+  await ResourceManager.loadTexture("tableTexture", "../textures/table.png");
+  await ResourceManager.loadTexture("whiteTexture", "../textures/white.png");
+  await ResourceManager.loadTexture("magnetTexture", "../textures/magnet.png");
+  await ResourceManager.loadTexture("heightMap", "../textures/heightMap.png");
 
   // Load models.
-  await resourceManager.loadModel("suzanne", "../models/suzanne.fbx");
-  await resourceManager.loadModel("table", "../models/table.fbx");
-  await resourceManager.loadModel("sea", "../models/sea.fbx");
-
-  await resourceManager.loadModel("cursor", "../models/cursor.fbx");
+  await ResourceManager.loadModel("table", "../models/table.fbx");
+  await ResourceManager.loadModel("sea", "../models/sea.fbx");
+  await ResourceManager.loadModel("magnet", "../models/magnet.fbx");
+  await ResourceManager.loadModel("cursor", "../models/cursor.fbx");
 
   // Load materials.
-  await resourceManager.loadMaterial(
+  await ResourceManager.loadMaterial(
     "toon",
     "../materials/toonV.glsl",
     "../materials/toonF.glsl",
@@ -93,14 +90,14 @@ async function loadResources() {
       lightColor: { value: new THREE.Color(1, 1, 1) },
       ambientIntensity: { value: 0.0 },
       ambientColor: { value: new THREE.Color(1.0, 0.0, 0.2, 1.0) },
-      baseTexture: { value: resourceManager.getTexture("debugTexture") },
+      baseTexture: { value: ResourceManager.getTexture("debugTexture") },
       baseColor: { value: new THREE.Color(1.0, 1.0, 1.0, 1.0) },
       time: { value: 0 },
       opacity: { value: 1 },
     }
   );
 
-  await resourceManager.loadMaterial(
+  await ResourceManager.loadMaterial(
     "lambertian",
     "../materials/lambertianV.glsl",
     "../materials/lambertianF.glsl",
@@ -113,13 +110,13 @@ async function loadResources() {
       ambientColor: { value: new THREE.Color(0.2, 0.2, 0.2) },
       ambientIntensity: { value: 0.01 },
       baseColor: { value: new THREE.Color(0.4, 0, 0.2, 1.0) },
-      baseTexture: { value: resourceManager.getTexture("debugTexture") },
+      baseTexture: { value: ResourceManager.getTexture("debugTexture") },
       time: { value: 0 },
       opacity: { value: 1 },
     }
   );
 
-  await resourceManager.loadMaterial(
+  await ResourceManager.loadMaterial(
     "sea",
     "../materials/seaV.glsl",
     "../materials/seaF.glsl",
@@ -130,23 +127,84 @@ async function loadResources() {
       ambientColor: { value: new THREE.Color(0.2, 0.2, 0.2) },
       ambientIntensity: { value: 0.0 },
       baseColor: { value: new THREE.Color(1.0, 1.0, 1.0, 1.0) },
-      baseTexture: { value: resourceManager.getTexture("debugTexture") },
+      baseTexture: { value: ResourceManager.getTexture("debugTexture") },
       time: { value: 0 },
       opacity: { value: 1 },
+      heightMap: { value: ResourceManager.getTexture("heightMap") },
+    }
+  );
+
+  await ResourceManager.loadMaterial(
+    "outline",
+    "../materials/outlineV.glsl",
+    "../materials/outlineF.glsl",
+    {
+      outlineThickness: { value: 0.02 },
+      curvatureFactor: { value: 0.5 },
+      distanceFactor: { value: 0.1 },
+      outlineColor: { value: new THREE.Color(0.15, 0.15, 0.1) },
+      // outlineColor: { value: new THREE.Color(1.0, 1.0, 1.0) },
     }
   );
 }
 
 async function createInitialScene() {
+  const camera = new GameObject("Camera", [new CameraManager()], ["camera"]);
+  camera.transform.setPosition(new Vector3(-4.7, 3.7, -4.5));
+  camera.transform.setRotation(
+    new Vector3(-2.324736956995415, -0.7327497832235694, -2.5226043559123186)
+  );
+
+  engine.instantiate(camera);
+
+  const physicsPlane = new GameObject(
+    "Plane",
+    [
+      new Renderer(
+        new THREE.BoxGeometry(3, 0.1, 5.6),
+        ResourceManager.getMaterial("lambertian")
+      ),
+      new PhysicsBody({
+        mass: 0,
+        shape: {
+          type: "box",
+          width: 1.5,
+          height: 0.1,
+          depth: 2.8,
+        },
+        showGizmo: false,
+      }),
+    ],
+    ["plane"]
+  );
+
+  physicsPlane.getComponent(Renderer).material.uniforms.baseColor.value =
+    new THREE.Color(1, 1, 1, 1);
+
+  physicsPlane.transform.setPosition(new Vector3(0, 0, -0.4));
+  physicsPlane.transform.setRotation(new Vector3(0, 0, 0));
+  physicsPlane.transform.setScale(new Vector3(1, 1, 1));
+  physicsPlane.getComponent(Renderer).mesh.visible = false;
+
+  engine.instantiate(physicsPlane);
+
   const spawner = new GameObject("Spawner", [new ObjectSpawner()], ["spawner"]);
 
   engine.instantiate(spawner);
 
-  const camera = new GameObject("Camera", [new CameraManager()], ["camera"]);
-  camera.transform.setPosition(new Vector3(0, 6, 7));
-  camera.transform.setRotation(new Vector3(-Math.PI / 6, 0, 0));
+  const raycastManager = new GameObject(
+    "RaycastManager",
+    [
+      new Raycast({
+        camera: core.camera,
+        objects: [physicsPlane.getComponent(Renderer).mesh],
+        objectSpawner: spawner,
+      }),
+    ],
+    ["raycast"]
+  );
 
-  engine.instantiate(camera);
+  engine.instantiate(raycastManager);
 
   const directionalLight = new GameObject(
     "DirectionalLight",
@@ -178,114 +236,31 @@ async function createInitialScene() {
 }
 
 async function createTemporarySceneObjects() {
-  const lambertianMaterial = resourceManager.getMaterial("lambertian");
-  const toonMaterial = resourceManager.getMaterial("toon");
-  const seaMaterial = resourceManager.getMaterial("sea");
-
-  const suzanneModel = resourceManager.getModel("suzanne");
-
-  const suzanne1 = new GameObject(
-    "Suzanne1",
-    [
-      new Renderer(suzanneModel.children[0], lambertianMaterial),
-      new Suzanne(),
-      new PhysicsBody({
-        mass: 1,
-        shape: { type: "sphere", radius: 1 },
-        showGizmo: true,
-      }),
-    ],
-    ["suzanne"]
-  );
-
-  const suzanne2 = new GameObject(
-    "Suzanne2",
-    [
-      new Renderer(suzanneModel.children[0], toonMaterial),
-      new Suzanne(),
-      new PhysicsBody({
-        mass: 1,
-        shape: { type: "sphere", radius: 1 },
-        showGizmo: true,
-      }),
-    ],
-    ["suzanne"]
-  );
+  const lambertianMaterial = ResourceManager.getMaterial("lambertian");
+  const toonMaterial = ResourceManager.getMaterial("toon");
+  const seaMaterial = ResourceManager.getMaterial("sea");
 
   const sea = new GameObject(
     "Sea",
-    [new Renderer(new THREE.PlaneGeometry(200, 200, 600, 600), seaMaterial)],
+    [new Renderer(new THREE.PlaneGeometry(400, 400, 1000, 1000), seaMaterial)],
     ["sea"]
   );
-
-  suzanne1.transform.setPosition(new Vector3(3, 30, 0));
-  suzanne2.transform.setPosition(new Vector3(-3, 5, 0));
-  sea.transform.setPosition(new Vector3(0, -5, 0));
-
-  suzanne1.transform.setRotation(new Vector3(-Math.PI / 2, 0, 0));
-  suzanne2.transform.setRotation(new Vector3(-Math.PI / 2, 0, 0));
+  sea.transform.setPosition(new Vector3(0, -8, 0));
   sea.transform.setRotation(new Vector3(-Math.PI / 2, 0, 0));
 
-  engine.instantiate(suzanne1);
-  engine.instantiate(suzanne2);
   engine.instantiate(sea);
 
-  const physicsPlane = new GameObject(
-    "Plane",
-    [
-      new Renderer(
-        new THREE.BoxGeometry(3, 0.1, 5.6),
-        resourceManager.getMaterial("lambertian")
-      ),
-      new PhysicsBody({
-        mass: 0,
-        shape: {
-          type: "box",
-          width: 1.5,
-          height: 0.1,
-          depth: 2.8,
-        },
-        showGizmo: true,
-      }),
-    ],
-    ["plane"]
-  );
-
-  physicsPlane.getComponent(Renderer).material.uniforms.baseColor.value =
-    new THREE.Color(1, 1, 1, 1);
-
-  physicsPlane.transform.setPosition(new Vector3(0, 0, -0.4));
-  physicsPlane.transform.setRotation(new Vector3(0, 0, 0));
-  physicsPlane.transform.setScale(new Vector3(1, 1, 1));
-  physicsPlane.getComponent(Renderer).mesh.visible = false;
-
-  engine.instantiate(physicsPlane);
-
-  const raycastManager = new GameObject(
-    "RaycastManager",
-    [
-      new Raycast({
-        camera: core.camera,
-        objects: [physicsPlane.getComponent(Renderer).mesh],
-      }),
-    ],
-    ["raycast"]
-  );
-
-  engine.instantiate(raycastManager);
-
-  const debugTexture = resourceManager.getTexture("debugTexture");
+  const debugTexture = ResourceManager.getTexture("debugTexture");
   debugTexture.wrapS = THREE.RepeatWrapping;
   debugTexture.wrapT = THREE.RepeatWrapping;
   debugTexture.repeat.set(10, 10);
 
   await createAirship();
-  createEnergySphere();
 }
 
 async function createAirship() {
-  await resourceManager.loadModel("airship", "../models/airship.fbx");
-  const group = resourceManager.getModel("airship");
+  await ResourceManager.loadModel("airship", "../models/airship.fbx");
+  const group = ResourceManager.getModel("airship");
 
   const bodyModel = group.children.find((child) => child.name === "body");
   const gearBackModel = group.children.find(
@@ -300,16 +275,21 @@ async function createAirship() {
   const wheelModel = group.children.find((child) => child.name === "wheel");
   const wingLModel = group.children.find((child) => child.name === "wing_l");
   const wingRModel = group.children.find((child) => child.name === "wing_r");
+  const exhaustModel = group.children.find((child) => child.name === "exhaust");
+  const capacitorModel = group.children.find(
+    (child) => child.name === "capacitor"
+  );
+  const dropperModel = group.children.find((child) => child.name === "dropper");
 
-  await resourceManager.loadTexture(
+  await ResourceManager.loadTexture(
     "airshipTexture",
     "../textures/airship.png"
   );
-  const airshipTexture = resourceManager.getTexture("airshipTexture");
+  const airshipTexture = ResourceManager.getTexture("airshipTexture");
   airshipTexture.magFilter = THREE.NearestFilter;
   airshipTexture.minFilter = THREE.NearestFilter;
 
-  const shipMaterial = resourceManager.getMaterial("toon");
+  const shipMaterial = ResourceManager.getMaterial("toon");
   shipMaterial.side = THREE.DoubleSide;
   shipMaterial.uniforms.baseTexture.value = airshipTexture;
 
@@ -358,6 +338,24 @@ async function createAirship() {
     ["airship"]
   );
 
+  const exhaust = new GameObject(
+    "AirshipExhaust",
+    [new Renderer(exhaustModel, shipMaterial)],
+    ["airship"]
+  );
+
+  const capacitor = new GameObject(
+    "AirshipCapacitor",
+    [new Renderer(capacitorModel, shipMaterial)],
+    ["airship"]
+  );
+
+  const dropper = new GameObject(
+    "AirshipDropper",
+    [new Renderer(dropperModel, shipMaterial)],
+    ["airship"]
+  );
+
   body.transform.setPosition(new Vector3(0, 0.1, 0));
   gearBack.transform.setPosition(new Vector3(0, -1.12, 0));
   gearBottom.transform.setPosition(new Vector3(0, -3, 1.9));
@@ -365,6 +363,9 @@ async function createAirship() {
   wheel.transform.setPosition(new Vector3(0, 0, 0));
   wingL.transform.setPosition(new Vector3(3.5, -1.5, 0));
   wingR.transform.setPosition(new Vector3(-3.5, -1.5, 0));
+  exhaust.transform.setPosition(new Vector3(0, 0, 0));
+  capacitor.transform.setPosition(new Vector3(0, 0, 0));
+  dropper.transform.setPosition(new Vector3(0, 0, 0));
 
   body.transform.setRotation(new Vector3(-Math.PI / 2, 0, Math.PI / 2));
   gearBack.transform.setRotation(new Vector3(-Math.PI / 2, 0, Math.PI / 2));
@@ -373,6 +374,9 @@ async function createAirship() {
   wheel.transform.setRotation(new Vector3(-Math.PI / 2, 0, Math.PI / 2));
   wingL.transform.setRotation(new Vector3(-Math.PI / 2, 0, Math.PI / 2));
   wingR.transform.setRotation(new Vector3(-Math.PI / 2, 0, Math.PI / 2));
+  exhaust.transform.setRotation(new Vector3(-Math.PI / 2, 0, Math.PI / 2));
+  capacitor.transform.setRotation(new Vector3(-Math.PI / 2, 0, Math.PI / 2));
+  dropper.transform.setRotation(new Vector3(-Math.PI / 2, 0, Math.PI / 2));
 
   engine.instantiate(body);
   engine.instantiate(gearBack);
@@ -381,46 +385,9 @@ async function createAirship() {
   engine.instantiate(wheel);
   engine.instantiate(wingL);
   engine.instantiate(wingR);
-}
-
-async function createEnergySphere() {
-  const material = resourceManager.getMaterial("toon");
-  material.uniforms.baseColor.value = new THREE.Color(0.2, 0.9, 1);
-  material.uniforms.opacity.value = 0.8;
-  material.uniforms.baseTexture.value =
-    resourceManager.getTexture("whiteTexture");
-
-  const materialShell = material.clone();
-  materialShell.uniforms.baseColor.value = new THREE.Color(0.4, 0.9, 1);
-  materialShell.uniforms.opacity.value = 0.5;
-  materialShell.depthWrite = false;
-
-  const sphereShell = new GameObject(
-    "EnergySphereShell",
-    [new Renderer(new THREE.SphereGeometry(0.12, 12, 12), materialShell)],
-    ["energySphere"]
-  );
-
-  sphereShell.getComponent(Renderer).mesh.renderOrder = 99;
-
-  const sphere = new GameObject(
-    "EnergySphere",
-    [
-      new Renderer(new THREE.SphereGeometry(0.08, 12, 12), material),
-      new PhysicsBody({
-        mass: 1,
-        shape: { type: "sphere", radius: 0.08 },
-      }),
-      new EnergySphere({ shell: sphereShell }),
-    ],
-    ["energySphere"]
-  );
-
-  sphere.transform.setPosition(new Vector3(0, 1, 2));
-  sphere.transform.setRotation(new Vector3(0, 0, 0));
-
-  engine.instantiate(sphere);
-  engine.instantiate(sphereShell);
+  engine.instantiate(exhaust);
+  engine.instantiate(capacitor);
+  engine.instantiate(dropper);
 }
 
 await start();
