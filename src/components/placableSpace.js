@@ -71,13 +71,7 @@ export default class PlacableSpace extends Component {
   checkHover(result) {
     if (result.type == "enter") {
       if (this.renderer.outlineMaterial) {
-        this.renderer.outlineMaterial.uniforms.outlineColor.value =
-          this.renderer.highlightOutlineColor;
-        this.renderer.material.uniforms.overlayColor.value = new THREE.Vector3(
-          1.3,
-          1.3,
-          1.3
-        );
+        this.renderer.toggleOutline(true);
       }
 
       this.cursorPosition.copy(result.intersect.point);
@@ -91,13 +85,7 @@ export default class PlacableSpace extends Component {
 
     if (result.type == "exit") {
       if (this.renderer.outlineMaterial) {
-        this.renderer.outlineMaterial.uniforms.outlineColor.value =
-          this.renderer.defaultOutlineColor;
-        this.renderer.material.uniforms.overlayColor.value = new THREE.Vector3(
-          1,
-          1,
-          1
-        );
+        this.renderer.toggleOutline(false);
       }
 
       this.cursor.visible = false;

@@ -19,7 +19,7 @@ varying float vFogDistance;
 
 varying vec3 fLightDirection;
 
-const float pixelSize = 4.5;
+const float pixelSize = 2.0;
 
 out vec4 fragColor;
 

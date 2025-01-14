@@ -28,25 +28,13 @@ export default class Dropper extends Component {
 
   checkHover(result) {
     if (result.type == "enter") {
-      this.renderer.outlineMaterial.uniforms.outlineColor.value =
-        this.renderer.highlightOutlineColor;
-      this.renderer.material.uniforms.overlayColor.value = new THREE.Vector3(
-        1.3,
-        1.3,
-        1.3
-      );
+      this.renderer.toggleOutline(true);
 
       this.isHovering = true;
     }
 
     if (result.type == "exit") {
-      this.renderer.outlineMaterial.uniforms.outlineColor.value =
-        this.renderer.defaultOutlineColor;
-      this.renderer.material.uniforms.overlayColor.value = new THREE.Vector3(
-        1,
-        1,
-        1
-      );
+      this.renderer.toggleOutline(false);
 
       this.isHovering = false;
     }

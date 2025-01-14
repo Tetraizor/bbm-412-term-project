@@ -11,7 +11,7 @@ const vec3 fogColor = vec3(0.82, 0.84, 0.94);
 const vec3 colorBottom = vec3(0.19, 0.39, 0.53); 
 const vec3 colorTop = vec3(1.0); 
 
-const float pixelSize = 2.25;
+const float pixelSize = 2.0;
 
 const float pattern1[9] = float[9](1.0, 1.0, 1.0,
                                   1.0, 0.0, 1.0,

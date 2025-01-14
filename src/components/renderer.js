@@ -17,6 +17,9 @@ export default class Renderer extends Component {
   defaultOutlineColor = new THREE.Vector3(0.15, 0.15, 0.1);
   highlightOutlineColor = new THREE.Vector3(1, 1, 0.5);
 
+  targetOverlayColor = new THREE.Vector3(1, 1, 1);
+  targetOutlineColor = new THREE.Vector3(1, 1, 1);
+
   constructor({
     geometry,
     material,
@@ -84,6 +87,17 @@ export default class Renderer extends Component {
       core.createMesh(outlineMesh);
     }
 
+    if (this.material.uniforms.overlayColor) {
+      this.material.uniforms.overlayColor.value = new THREE.Vector3(1, 1, 1);
+      this.targetOverlayColor = new THREE.Vector3(1, 1, 1);
+    }
+
+    if (this.outlineMaterial?.uniforms.outlineColor) {
+      this.outlineMaterial.uniforms.outlineColor.value =
+        this.defaultOutlineColor;
+      this.targetOutlineColor = this.defaultOutlineColor;
+    }
+
     this.gameObject.transform.addListener("onPositionChanged", (event) => {
       this.onPositionChanged(event.detail.position);
     });
@@ -149,7 +163,31 @@ export default class Renderer extends Component {
     }
   }
 
+  toggleOutline(state) {
+    if (state) {
+      this.targetOutlineColor = this.highlightOutlineColor;
+      this.targetOverlayColor = new THREE.Vector3(1.5, 1.5, 1.5);
+    } else {
+      this.targetOutlineColor = new THREE.Vector3(0, 0, 0);
+      this.targetOverlayColor = new THREE.Vector3(1, 1, 1);
+    }
+  }
+
   update() {
+    if (this.outlineMaterial) {
+      this.outlineMaterial.uniforms.outlineColor.value.lerp(
+        this.targetOutlineColor,
+        0.3
+      );
+    }
+
+    if (this.material.uniforms.overlayColor) {
+      this.material.uniforms.overlayColor.value.lerp(
+        this.targetOverlayColor,
+        0.3
+      );
+    }
+
     this.updateUniform("time", core.time / 1000);
   }
 
