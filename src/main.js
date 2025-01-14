@@ -17,6 +17,8 @@ import ResourceManager from "./resourceManager.js";
 import UIManager from "./uiManager.js";
 import Raycast from "./components/raycast.js";
 import Airship from "./components/airship.js";
+import Dropper from "./components/dropper.js";
+import PlacableSpace from "./components/placableSpace.js";
 
 const uiManager = new UIManager();
 
@@ -92,6 +94,7 @@ async function loadResources() {
       ambientColor: { value: new THREE.Color(1.0, 0.0, 0.2, 1.0) },
       baseTexture: { value: ResourceManager.getTexture("debugTexture") },
       baseColor: { value: new THREE.Color(1.0, 1.0, 1.0, 1.0) },
+      overlayColor: { value: new THREE.Color(1.0, 1.0, 1.0, 1.0) },
       time: { value: 0 },
       opacity: { value: 1 },
     }
@@ -160,20 +163,22 @@ async function createInitialScene() {
   const physicsPlane = new GameObject(
     "Plane",
     [
-      new Renderer(
-        new THREE.BoxGeometry(3, 0.1, 5.6),
-        ResourceManager.getMaterial("lambertian")
-      ),
+      new Renderer({
+        geometry: new THREE.BoxGeometry(2.8, 0.1, 5.4),
+        material: ResourceManager.getMaterial("toon"),
+        hideOutline: true,
+      }),
       new PhysicsBody({
         mass: 0,
         shape: {
           type: "box",
-          width: 1.5,
+          width: 1.4,
           height: 0.1,
-          depth: 2.8,
+          depth: 2.7,
         },
         showGizmo: false,
       }),
+      new PlacableSpace(),
     ],
     ["plane"]
   );
@@ -181,12 +186,122 @@ async function createInitialScene() {
   physicsPlane.getComponent(Renderer).material.uniforms.baseColor.value =
     new THREE.Color(1, 1, 1, 1);
 
-  physicsPlane.transform.setPosition(new Vector3(0, 0, -0.4));
+  physicsPlane.transform.setPosition(new Vector3(0, 0, -0.3));
   physicsPlane.transform.setRotation(new Vector3(0, 0, 0));
   physicsPlane.transform.setScale(new Vector3(1, 1, 1));
   physicsPlane.getComponent(Renderer).mesh.visible = false;
 
   engine.instantiate(physicsPlane);
+
+  const boundary1 = new GameObject(
+    "Boundary1",
+    [
+      new Renderer({
+        geometry: new THREE.BoxGeometry(0.1, 0.18, 6),
+        material: ResourceManager.getMaterial("toon"),
+        hideOutline: true,
+      }),
+      new PhysicsBody({
+        mass: 0,
+        shape: {
+          type: "box",
+          width: 0.05,
+          height: 0.15,
+          depth: 2.7,
+        },
+        showGizmo: core.debugMode,
+      }),
+    ],
+    ["boundary"]
+  );
+  const boundary2 = new GameObject(
+    "Boundary1",
+    [
+      new Renderer({
+        geometry: new THREE.BoxGeometry(0.1, 0.18, 6),
+        material: ResourceManager.getMaterial("toon"),
+        hideOutline: true,
+      }),
+      new PhysicsBody({
+        mass: 0,
+        shape: {
+          type: "box",
+          width: 0.05,
+          height: 0.15,
+          depth: 2.7,
+        },
+        showGizmo: core.debugMode,
+      }),
+    ],
+    ["boundary"]
+  );
+  const boundary3 = new GameObject(
+    "Boundary1",
+    [
+      new Renderer({
+        geometry: new THREE.BoxGeometry(0.1, 0.18, 6),
+        material: ResourceManager.getMaterial("toon"),
+        hideOutline: true,
+      }),
+      new PhysicsBody({
+        mass: 0,
+        shape: {
+          type: "box",
+          width: 0.05,
+          height: 0.15,
+          depth: 1.4,
+        },
+        showGizmo: core.debugMode,
+      }),
+    ],
+    ["boundary"]
+  );
+  const boundary4 = new GameObject(
+    "Boundary1",
+    [
+      new Renderer({
+        geometry: new THREE.BoxGeometry(0.1, 0.2, 6),
+        material: ResourceManager.getMaterial("toon"),
+        hideOutline: true,
+      }),
+      new PhysicsBody({
+        mass: 0,
+        shape: {
+          type: "box",
+          width: 0.05,
+          height: 0.15,
+          depth: 1.4,
+        },
+        showGizmo: core.debugMode,
+      }),
+    ],
+    ["boundary"]
+  );
+
+  boundary1.transform.setPosition(new Vector3(-1.45, 0.25, -0.3));
+  boundary1.transform.setRotation(new Vector3(0, 0, 0));
+  boundary1.transform.setScale(new Vector3(1, 1, 1));
+  boundary1.getComponent(Renderer).mesh.visible = false;
+
+  boundary2.transform.setPosition(new Vector3(1.45, 0.25, -0.3));
+  boundary2.transform.setRotation(new Vector3(0, 0, 0));
+  boundary2.transform.setScale(new Vector3(1, 1, 1));
+  boundary2.getComponent(Renderer).mesh.visible = false;
+
+  boundary3.transform.setPosition(new Vector3(0, 0.25, -3));
+  boundary3.transform.setRotation(new Vector3(0, Math.PI / 2, 0));
+  boundary3.transform.setScale(new Vector3(1, 1, 1));
+  boundary3.getComponent(Renderer).mesh.visible = false;
+
+  boundary4.transform.setPosition(new Vector3(0, 0.25, 2.4));
+  boundary4.transform.setRotation(new Vector3(0, Math.PI / 2, 0));
+  boundary4.transform.setScale(new Vector3(1, 1, 1));
+  boundary4.getComponent(Renderer).mesh.visible = false;
+
+  engine.instantiate(boundary1);
+  engine.instantiate(boundary2);
+  engine.instantiate(boundary3);
+  engine.instantiate(boundary4);
 
   const spawner = new GameObject("Spawner", [new ObjectSpawner()], ["spawner"]);
 
@@ -198,13 +313,14 @@ async function createInitialScene() {
       new Raycast({
         camera: core.camera,
         objects: [physicsPlane.getComponent(Renderer).mesh],
-        objectSpawner: spawner,
       }),
     ],
     ["raycast"]
   );
 
   engine.instantiate(raycastManager);
+  core.raycast = raycastManager.getComponent(Raycast);
+  core.objectSpawner = spawner.getComponent(ObjectSpawner);
 
   const directionalLight = new GameObject(
     "DirectionalLight",
@@ -242,7 +358,12 @@ async function createTemporarySceneObjects() {
 
   const sea = new GameObject(
     "Sea",
-    [new Renderer(new THREE.PlaneGeometry(400, 400, 1000, 1000), seaMaterial)],
+    [
+      new Renderer({
+        geometry: new THREE.PlaneGeometry(400, 400, 1000, 1000),
+        material: seaMaterial,
+      }),
+    ],
     ["sea"]
   );
   sea.transform.setPosition(new Vector3(0, -8, 0));
@@ -295,44 +416,54 @@ async function createAirship() {
 
   const gearBack = new GameObject(
     "AirshipGearBack",
-    [new Renderer(gearBackModel, shipMaterial)],
+    [new Renderer({ geometry: gearBackModel, material: shipMaterial })],
     ["airship"]
   );
 
   const gearBottom = new GameObject(
     "AirshipGearBottom",
-    [new Renderer(gearBottomModel, shipMaterial)],
+    [
+      new Renderer({
+        geometry: gearBottomModel,
+        material: shipMaterial.clone(),
+      }),
+    ],
     ["airship"]
   );
 
   const gearSides = new GameObject(
     "AirshipGearSides",
-    [new Renderer(gearSidesModel, shipMaterial)],
+    [
+      new Renderer({
+        geometry: gearSidesModel,
+        material: shipMaterial.clone(),
+      }),
+    ],
     ["airship"]
   );
 
   const wheel = new GameObject(
     "AirshipWheel",
-    [new Renderer(wheelModel, shipMaterial)],
+    [new Renderer({ geometry: wheelModel, material: shipMaterial.clone() })],
     ["airship"]
   );
 
   const wingL = new GameObject(
     "AirshipWingL",
-    [new Renderer(wingLModel, shipMaterial)],
+    [new Renderer({ geometry: wingLModel, material: shipMaterial.clone() })],
     ["airship"]
   );
 
   const wingR = new GameObject(
     "AirshipWingR",
-    [new Renderer(wingRModel, shipMaterial)],
+    [new Renderer({ geometry: wingRModel, material: shipMaterial.clone() })],
     ["airship"]
   );
 
   const body = new GameObject(
     "AirshipBody",
     [
-      new Renderer(bodyModel, shipMaterial),
+      new Renderer({ geometry: bodyModel, material: shipMaterial.clone() }),
       new Airship(wingL, wingR, gearSides, gearBottom, gearBack, wheel),
     ],
     ["airship"]
@@ -340,19 +471,31 @@ async function createAirship() {
 
   const exhaust = new GameObject(
     "AirshipExhaust",
-    [new Renderer(exhaustModel, shipMaterial)],
+    [new Renderer({ geometry: exhaustModel, material: shipMaterial.clone() })],
     ["airship"]
   );
 
   const capacitor = new GameObject(
     "AirshipCapacitor",
-    [new Renderer(capacitorModel, shipMaterial)],
+    [
+      new Renderer({
+        geometry: capacitorModel,
+        material: shipMaterial.clone(),
+      }),
+    ],
     ["airship"]
   );
 
   const dropper = new GameObject(
     "AirshipDropper",
-    [new Renderer(dropperModel, shipMaterial)],
+    [
+      new Renderer({
+        geometry: dropperModel,
+        material: shipMaterial.clone(),
+        outlineOverride: 1.005,
+      }),
+      new Dropper(),
+    ],
     ["airship"]
   );
 
@@ -361,8 +504,8 @@ async function createAirship() {
   gearBottom.transform.setPosition(new Vector3(0, -3, 1.9));
   gearSides.transform.setPosition(new Vector3(0, -1.3, 0));
   wheel.transform.setPosition(new Vector3(0, 0, 0));
-  wingL.transform.setPosition(new Vector3(3.5, -1.5, 0));
-  wingR.transform.setPosition(new Vector3(-3.5, -1.5, 0));
+  wingL.transform.setPosition(new Vector3(3.5, -1.2, 0));
+  wingR.transform.setPosition(new Vector3(-3.5, -1.2, 0));
   exhaust.transform.setPosition(new Vector3(0, 0, 0));
   capacitor.transform.setPosition(new Vector3(0, 0, 0));
   dropper.transform.setPosition(new Vector3(0, 0, 0));

@@ -7,6 +7,7 @@ uniform vec3 ambientColor;
 uniform float ambientIntensity;
 
 uniform vec3 baseColor;
+uniform vec3 overlayColor;
 uniform sampler2D baseTexture;
 
 uniform float opacity;
@@ -18,7 +19,7 @@ varying float vFogDistance;
 
 varying vec3 fLightDirection;
 
-const float pixelSize = 2.0;
+const float pixelSize = 4.5;
 
 out vec4 fragColor;
 
@@ -64,7 +65,7 @@ void main() {
     vec3 shadedColor = toonFactor + ambientColor * ambientIntensity;
     vec4 textureColor = texture2D(baseTexture, vUv);
         
-    vec4 finalColor = vec4(shadedColor, 1.0) * textureColor * vec4(baseColor.xyz, opacity);
+    vec4 finalColor = vec4(shadedColor, 1.0) * textureColor * vec4(baseColor.xyz * overlayColor.xyz, opacity);
 
     float fogFactor = exp(-.02 * vFogDistance);
     fogFactor = clamp(fogFactor, 0.0, 1.0);

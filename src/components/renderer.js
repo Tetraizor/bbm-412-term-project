@@ -1,7 +1,6 @@
 import Component from "./component.js";
 import * as THREE from "three";
 import core from "../core.js";
-import engine from "../engine.js";
 import AmbientLight from "./light/ambientLight.js";
 import DirectionalLight from "./light/directionalLight.js";
 import ResourceManager from "../resourceManager.js";
@@ -10,26 +9,36 @@ export default class Renderer extends Component {
   mesh = null;
   material = null;
   outlineMesh = null;
+  outlineMaterial = null;
 
   OUTLINE_THICKNESS = 1.01;
   outlineOverride = 1;
 
-  constructor(model, material, outlineOverride = 1) {
+  defaultOutlineColor = new THREE.Vector3(0.15, 0.15, 0.1);
+  highlightOutlineColor = new THREE.Vector3(1, 1, 0.5);
+
+  constructor({
+    geometry,
+    material,
+    outlineOverride = 1,
+    hideOutline = false,
+  }) {
     super();
 
-    if (!model || !material) {
+    if (!geometry || !material) {
       throw new Error("Renderer component requires a geometry and a material");
     }
 
     this.material = material;
     this.outlineOverride = outlineOverride;
+    this.hideOutline = hideOutline;
 
-    if (model.isObject3D) {
-      this.mesh = new THREE.Mesh(model.geometry, this.material);
+    if (geometry.isObject3D) {
+      this.mesh = new THREE.Mesh(geometry.geometry, this.material);
 
       core.createMesh(this.mesh);
     } else {
-      this.geometry = model;
+      this.geometry = geometry;
       this.mesh = new THREE.Mesh(this.geometry, this.material);
 
       core.createMesh(this.mesh);
@@ -48,7 +57,7 @@ export default class Renderer extends Component {
 
   onScaleChanged(scale) {
     this.mesh.scale.set(scale.x, scale.y, scale.z);
-    this.outlineMesh.scale.set(scale.x, scale.y, scale.z);
+    this.outlineMesh?.scale.set(scale.x, scale.y, scale.z);
     this.outlineMesh?.scale.multiplyScalar(
       this.OUTLINE_THICKNESS * this.outlineOverride
     );
@@ -56,20 +65,24 @@ export default class Renderer extends Component {
 
   start() {
     // Add outline shader
-    const outlineMaterial = ResourceManager.getMaterial("outline", true);
-    outlineMaterial.side = THREE.BackSide;
-    outlineMaterial.uniforms.outlineThickness.value =
-      1 - this.OUTLINE_THICKNESS * this.outlineOverride;
+    if (!this.hideOutline) {
+      const outlineMaterial = ResourceManager.getMaterial("outline", true);
+      outlineMaterial.side = THREE.BackSide;
+      outlineMaterial.uniforms.outlineThickness.value =
+        1 - this.OUTLINE_THICKNESS * this.outlineOverride;
+      outlineMaterial.uniforms.outlineColor.value = this.defaultOutlineColor;
 
-    const outlineMesh = new THREE.Mesh(this.mesh.geometry, outlineMaterial);
+      const outlineMesh = new THREE.Mesh(this.mesh.geometry, outlineMaterial);
 
-    outlineMesh.position.copy(this.mesh.position);
-    outlineMesh.rotation.copy(this.mesh.rotation);
-    outlineMesh.scale.copy(this.mesh.scale);
+      outlineMesh.position.copy(this.mesh.position);
+      outlineMesh.rotation.copy(this.mesh.rotation);
+      outlineMesh.scale.copy(this.mesh.scale);
 
-    this.outlineMesh = outlineMesh;
+      this.outlineMaterial = outlineMaterial;
+      this.outlineMesh = outlineMesh;
 
-    core.createMesh(outlineMesh);
+      core.createMesh(outlineMesh);
+    }
 
     this.gameObject.transform.addListener("onPositionChanged", (event) => {
       this.onPositionChanged(event.detail.position);

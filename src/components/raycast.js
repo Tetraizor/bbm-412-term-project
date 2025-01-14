@@ -10,86 +10,70 @@ export default class Raycast extends Component {
   camera = null;
   objects = [];
 
-  objectSpawner = null;
-
   cursorPosition = new THREE.Vector3();
 
   cursor = null;
 
-  constructor({ camera, objects, objectSpawner }) {
+  objectListeners = [];
+  lastObjectStates = {};
+
+  constructor({ camera, objects }) {
     super();
 
     this.camera = camera;
     this.objects = objects;
-    this.objectSpawner = objectSpawner;
   }
 
   start() {
-    const cursorGeometry =
-      ResourceManager.getModel("cursor").children[0].geometry;
-
-    const cursorMaterial = new THREE.MeshBasicMaterial({
-      opacity: 0.9,
-      color: 0xddcccc,
-      transparent: true,
-      depthWrite: false,
-    });
-
-    this.cursor = new THREE.Mesh(cursorGeometry, cursorMaterial);
-    this.cursor.renderOrder = 999;
-    this.cursor.position.set(0, 0, 0);
-    this.cursor.rotation.set(-Math.PI / 2, 0, 0);
-    this.cursor.scale.set(0.25, 0.25, 1);
-    core.scene.add(this.cursor);
-
     core.inputManager.addListener("mouseMove", (event) => {
       this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
       this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-    });
 
-    core.inputManager.addListener("mouseDown", (event) => {
-      if (event.clickId === 0) {
-        const targetPosition = this.cursorPosition.clone();
-        targetPosition.y = 0.1;
-
-        this.attemptSpawnObject({
-          position: targetPosition,
-          object: "magnet",
-        });
-      }
+      this.cursorPosition.x = this.mouse.x;
+      this.cursorPosition.y = this.mouse.y;
+      this.cursorPosition.z = 0;
     });
   }
 
-  attemptSpawnObject({ position, object }) {
-    this.objectSpawner
-      .getComponent(ObjectSpawner)
-      .spawnObject(position, object);
+  addListener(object, callback) {
+    this.objectListeners.push({ object, callback });
+  }
+
+  checkIntersection(object, callback) {
+    this.lastObjectStates[object.id] =
+      this.lastObjectStates[object.id] || false;
   }
 
   update() {
-    this.raycaster.setFromCamera(this.mouse, this.camera);
-    const intersects = this.raycaster.intersectObjects(this.objects);
+    const currentObjectStates = {};
 
-    const oldState = this.cursor.visible;
-    this.cursor.visible = false;
+    this.objectListeners.forEach((listener) => {
+      this.raycaster.setFromCamera(this.mouse, this.camera);
+      const intersects = this.raycaster.intersectObject(listener.object);
 
-    if (intersects.length > 0) {
-      const intersect = intersects[0];
-      this.cursorPosition.copy(intersect.point);
-      this.cursorPosition.y += 0.04;
+      // Set object state to raycast result
+      let objectState = null;
 
-      if (!oldState) {
-        this.cursor.position.copy(intersect.point);
+      if (intersects.length > 0) {
+        objectState = intersects[0];
       }
 
-      this.cursor.visible = true;
-    }
+      currentObjectStates[listener.object.id] = objectState;
+    });
 
-    this.cursor.position.lerp(this.cursorPosition, 0.2);
+    this.objectListeners.forEach((listener) => {
+      const currentState = currentObjectStates[listener.object.id];
+      const lastState = this.lastObjectStates[listener.object.id];
 
-    this.cursor.rotation.z += 0.01;
-    this.cursor.scale
-      .set(0.25, 0.25, 1)
-      .multiplyScalar(1 + Math.sin(core.time / 250) * 0.1);
+      if (currentState && !lastState) {
+        listener.callback({ intersect: currentState, type: "enter" });
+      } else if (!currentState && lastState) {
+        listener.callback({ intersect: currentState, type: "exit" });
+      } else if (currentState && lastState) {
+        listener.callback({ intersect: currentState, type: "stay" });
+      }
+    });
+
+    this.lastObjectStates = currentObjectStates;
   }
 }

@@ -11,6 +11,8 @@ export default {
   renderer: null,
   directionalLight: null,
   ambientLight: null,
+  raycast: null,
+  objectSpawner: null,
 
   // CANNON.js
   world: null,
@@ -19,7 +21,7 @@ export default {
   prerenderHooks: [],
   postrenderHooks: [],
 
-  debugMode: true,
+  debugMode: false,
 
   time: 0,
   lastTime: 0,
