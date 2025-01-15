@@ -15,15 +15,17 @@ export default class Magnet extends Component {
   type = null;
   width = 1;
   height = 2;
+  strong = false;
 
   highlighting = false;
 
-  constructor({ type, width = 1, height = 2 }) {
+  constructor({ type, width = 1, height = 2, strong = false }) {
     super();
 
     this.type = type;
     this.width = width;
     this.height = height;
+    this.strong = strong;
   }
 
   start() {
@@ -87,6 +89,7 @@ export default class Magnet extends Component {
           length: this.height,
           width: this.width,
           type: this.type,
+          strong: this.strong,
         }),
       ],
       ["forceField"]
@@ -105,6 +108,8 @@ export default class Magnet extends Component {
     core.gamePlayManager.unregisterForceField(
       this.forceField.getComponent(ForceField)
     );
+
+    core.audioManager.playSFX("metalPlace");
 
     engine.destroy(this.forceField.id);
   }

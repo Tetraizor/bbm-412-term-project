@@ -17,6 +17,7 @@ export default class GizmoRenderer extends Component {
   arrow = null;
   plane = null;
   box = null;
+  custom = null;
 
   constructor(gizmo) {
     super();
@@ -26,6 +27,7 @@ export default class GizmoRenderer extends Component {
     this.height = gizmo.height;
     this.type = gizmo.type;
     this.radius = gizmo.radius;
+    this.custom = gizmo.custom;
   }
 
   createArrow() {
@@ -183,6 +185,8 @@ export default class GizmoRenderer extends Component {
     this.gameObject.transform.setScale();
   }
 
+  createCustom() {}
+
   start() {
     super.start();
 
@@ -199,6 +203,8 @@ export default class GizmoRenderer extends Component {
       case "sphere":
         this.createSphere();
         break;
+      case "custom":
+        this.createCustom();
     }
   }
 
@@ -221,6 +227,10 @@ export default class GizmoRenderer extends Component {
         break;
       case "sphere":
         core.scene.remove(this.sphere);
+        break;
+      case "custom":
+        core.scene.remove(this.custom);
+        break;
     }
   }
 }

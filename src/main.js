@@ -12,6 +12,7 @@ import CameraManager from "./components/cameraManager.js";
 import AmbientLight from "./components/light/ambientLight.js";
 import DirectionalLight from "./components/light/directionalLight.js";
 import PhysicsBody from "./components/physicsBody.js";
+import Lava from "./components/lava.js";
 
 import ResourceManager from "./resourceManager.js";
 import UIManager from "./uiManager.js";
@@ -22,8 +23,6 @@ import PlacableSpace from "./components/placableSpace.js";
 import GamePlayManager from "./components/gameplayManager.js";
 import Vacuum from "./components/vacuum.js";
 import AudioManager from "./components/audioManager.js";
-
-const uiManager = new UIManager();
 
 function prerender() {
   cumulativeFPS += core.fps;
@@ -44,6 +43,13 @@ async function start() {
   await loadResources();
   await createInitialScene();
   await createTemporarySceneObjects();
+
+  const level = new URLSearchParams(window.location.search).get("level");
+  if (level) {
+    createLevel(level);
+  } else {
+    createLevel(1);
+  }
 }
 
 async function initializeEngine() {
@@ -88,6 +94,17 @@ async function loadResources() {
     "forceFieldTexture",
     "../textures/forceField.png"
   );
+  await ResourceManager.loadTexture("lava", "../textures/lava.jpg");
+  await ResourceManager.loadTexture(
+    "strongPositiveMagnetTexture",
+    "../textures/positiveStrongMagnet.png"
+  );
+  await ResourceManager.loadTexture(
+    "strongNegativeMagnetTexture",
+    "../textures/negativeStrongMagnet.png"
+  );
+  await ResourceManager.loadTexture("metal", "../textures/metal.jpg");
+  await ResourceManager.loadTexture("names", "../textures/names.jpg");
 
   // Load models.
   await ResourceManager.loadModel("table", "../models/table.fbx");
@@ -95,6 +112,12 @@ async function loadResources() {
   await ResourceManager.loadModel("magnet", "../models/magnet.fbx");
   await ResourceManager.loadModel("cursor", "../models/cursor.fbx");
   await ResourceManager.loadModel("forceField", "../models/forceField.fbx");
+  await ResourceManager.loadModel("cone", "../models/cone.fbx");
+  await ResourceManager.loadModel("lava1", "../models/lava1.fbx");
+  await ResourceManager.loadModel("strongMagnet", "../models/strongMagnet.fbx");
+  await ResourceManager.loadModel("cube", "../models/cube.fbx");
+  await ResourceManager.loadModel("ramp", "../models/ramp.fbx");
+  await ResourceManager.loadModel("names", "../models/names.fbx");
 
   // Load materials.
   await ResourceManager.loadMaterial(
@@ -110,6 +133,7 @@ async function loadResources() {
       baseTexture: { value: ResourceManager.getTexture("debugTexture") },
       baseColor: { value: new THREE.Color(1.0, 1.0, 1.0, 1.0) },
       overlayColor: { value: new THREE.Color(1.0, 1.0, 1.0, 1.0) },
+      textureOffset: { value: new THREE.Vector2(0, 0) },
       time: { value: 0 },
       opacity: { value: 1 },
     }
@@ -129,6 +153,7 @@ async function loadResources() {
       baseColor: { value: new THREE.Color(1.0, 1.0, 1.0) },
       baseTexture: { value: ResourceManager.getTexture("whiteTexture") },
       overlayColor: { value: new THREE.Color(1.0, 1.0, 1.0, 1.0) },
+      textureOffset: { value: new THREE.Vector2(0, 0) },
       time: { value: 0 },
       opacity: { value: 1 },
     }
@@ -149,6 +174,7 @@ async function loadResources() {
       time: { value: 0 },
       opacity: { value: 1 },
       overlayColor: { value: new THREE.Color(1.0, 1.0, 1.0, 1.0) },
+      textureOffset: { value: new THREE.Vector2(0, 0) },
       heightMap: { value: ResourceManager.getTexture("heightMap") },
     }
   );
@@ -163,6 +189,7 @@ async function loadResources() {
       distanceFactor: { value: 0.1 },
       overlayColor: { value: new THREE.Color(1.0, 1.0, 1.0, 1.0) },
       outlineColor: { value: new THREE.Color(0.15, 0.15, 0.1) },
+      textureOffset: { value: new THREE.Vector2(0, 0) },
       // outlineColor: { value: new THREE.Color(1.0, 1.0, 1.0) },
     }
   );
@@ -185,6 +212,8 @@ async function loadResources() {
 }
 
 async function createInitialScene() {
+  core.uiManager = new UIManager();
+
   const gamePlayManager = new GameObject(
     "GamePlayManager",
     [new GamePlayManager()],
@@ -462,6 +491,39 @@ async function createInitialScene() {
 
   core.ambientLight = ambientLight;
   core.directionalLight = directionalLight;
+
+  const namesModel = ResourceManager.getModel("names");
+  const namesMaterial = ResourceManager.getMaterial("toon").clone();
+  namesMaterial.uniforms.baseColor.value = new THREE.Color(1, 0.4, 0.4);
+  namesMaterial.uniforms.baseTexture.value =
+    ResourceManager.getTexture("names");
+
+  const namesMaterialLambert =
+    ResourceManager.getMaterial("lambertian").clone();
+  namesMaterialLambert.uniforms.baseColor.value = new THREE.Color(1, 0.4, 0.4);
+  namesMaterialLambert.uniforms.baseTexture.value =
+    ResourceManager.getTexture("names");
+
+  const names = new GameObject(
+    "Names",
+    [
+      new Renderer({
+        geometry: namesModel.children[0].geometry,
+        material: namesMaterial,
+        lambertMaterial: namesMaterialLambert,
+        hideOutline: true,
+      }),
+    ],
+    ["names"]
+  );
+
+  names.transform.setPosition(new Vector3(10, 10, 10));
+  names.transform.setRotation(new Vector3(-Math.PI / 2, 0, 0));
+  names.transform.setScale(new Vector3(1, 1, 1));
+
+  console.log(namesModel);
+
+  engine.instantiate(names);
 }
 
 async function createTemporarySceneObjects() {
@@ -694,5 +756,69 @@ async function createAirship() {
   engine.instantiate(capacitor);
   engine.instantiate(dropper);
 }
+
+function createLevel(id) {
+  console.log("Starting level " + id);
+
+  switch (id) {
+    case "1":
+      createLevel1();
+      break;
+    case "2":
+      createLevel2();
+      break;
+    case "3":
+      createLevel3();
+      break;
+  }
+}
+
+function createLevel1() {
+  const lavaTexture = ResourceManager.getTexture("lava");
+  lavaTexture.wrapS = THREE.RepeatWrapping;
+  lavaTexture.wrapT = THREE.RepeatWrapping;
+  lavaTexture.repeat.set(1, 1);
+
+  lavaTexture.minFilter = THREE.LinearFilter;
+  lavaTexture.magFilter = THREE.LinearFilter;
+
+  const lavaLambertian = ResourceManager.getMaterial("lambertian");
+  lavaLambertian.uniforms.baseTexture.value = lavaTexture;
+
+  const lavaToon = ResourceManager.getMaterial("toon");
+  lavaToon.uniforms.baseTexture.value = lavaTexture;
+
+  const lava1 = new GameObject(
+    "Lava1",
+    [
+      new Renderer({
+        geometry: ResourceManager.getModel("lava1").children[0].geometry,
+        material: lavaToon,
+        lambertMaterial: lavaLambertian,
+      }),
+      new PhysicsBody({
+        mass: 0,
+        shape: {
+          type: "custom",
+        },
+        geometry: ResourceManager.getModel("lava1").children[0].geometry,
+        showGizmo: core.debugMode,
+        collisionResponse: false,
+      }),
+      new Lava(),
+    ],
+    ["lava1"]
+  );
+
+  lava1.transform.setPosition(new Vector3(-1.4, 0.2, 0));
+  lava1.transform.setScale(new Vector3(1, 1, 1));
+  lava1.transform.setRotation(new Vector3(-Math.PI / 2, 0, 0));
+
+  engine.instantiate(lava1);
+}
+
+function createLevel2() {}
+
+function createLevel3() {}
 
 await start();

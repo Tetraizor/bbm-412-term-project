@@ -16,6 +16,7 @@ export default class ForceField extends Component {
 
   fieldDirection = new Vector3(0, 0, 1);
 
+  strong = false;
   length = 3;
   width = 0.5;
 
@@ -23,13 +24,14 @@ export default class ForceField extends Component {
 
   type = null;
 
-  constructor({ magnet, length = 2, width = 1, type }) {
+  constructor({ magnet, length = 2, width = 1, type, strong = false }) {
     super();
 
     this.magnet = magnet;
     this.length = length;
     this.width = width;
     this.type = type;
+    this.strong = strong;
 
     if (type === "positiveMagnet") {
       this.fieldDirection = new Vector3(0, 0, 1);
@@ -177,7 +179,7 @@ export default class ForceField extends Component {
       sphere.physicsBody.body.applyForce(
         this.fieldDirection
           .normalize()
-          .multiplyScalar(0.5)
+          .multiplyScalar(this.strong ? 3 : 0.5)
           .multiplyScalar(this.type === "positive" ? -1 : 1)
       );
     });

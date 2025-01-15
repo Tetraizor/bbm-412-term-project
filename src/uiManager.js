@@ -8,6 +8,8 @@ export default class UIManager {
   states = {
     help: false,
     settings: false,
+    won: false,
+    lost: false,
   };
 
   buttons = {
@@ -24,6 +26,9 @@ export default class UIManager {
     buyButton1: document.getElementById("buyButton1"),
     buyButton2: document.getElementById("buyButton2"),
     buyButton3: document.getElementById("buyButton3"),
+    buyButton4: document.getElementById("buyButton4"),
+    buyButton6: document.getElementById("buyButton6"),
+    buyButton7: document.getElementById("buyButton7"),
 
     shaderButton1: document.getElementById("shaderButton1"),
     shaderButton2: document.getElementById("shaderButton2"),
@@ -32,6 +37,12 @@ export default class UIManager {
   panels = {
     help: {
       root: document.getElementById("help"),
+    },
+    won: {
+      root: document.getElementById("won"),
+    },
+    lost: {
+      root: document.getElementById("lost"),
     },
   };
 
@@ -82,6 +93,10 @@ export default class UIManager {
         this.toggle("help");
       }
 
+      if (event.key == "o") {
+        core.gamePlayManager.won();
+      }
+
       if (event.key == "Escape" || event.key == "Esc") {
         this.toggleSettings();
       }
@@ -101,6 +116,21 @@ export default class UIManager {
         this.onButtonPressed(key);
       });
     }
+
+    document
+      .getElementById("exploreThisLevel")
+      .addEventListener("click", () => {
+        this.toggleForce("won", false);
+        core.gamePlayManager.components = 999;
+        core.gamePlayManager.updateUI();
+      });
+
+    document.getElementById("nextLevelButton").addEventListener("click", () => {
+      const level = new URLSearchParams(window.location.search).get("level");
+      const thisLevel = parseInt(level);
+
+      window.location.href = `./start.html?level=${thisLevel + 1}`;
+    });
   }
 
   toggleSettings() {
@@ -154,7 +184,16 @@ export default class UIManager {
         core.gamePlayManager.buyItem({ item: "positiveMagnet" });
         break;
       case "buyButton3":
-        core.gamePlayManager.buyItem({ item: "spinningMagnet" });
+        core.gamePlayManager.buyItem({ item: "strongNegativeMagnet" });
+        break;
+      case "buyButton4":
+        core.gamePlayManager.buyItem({ item: "strongPositiveMagnet" });
+        break;
+      case "buyButton6":
+        core.gamePlayManager.buyItem({ item: "cube" });
+        break;
+      case "buyButton7":
+        core.gamePlayManager.buyItem({ item: "ramp" });
         break;
       case "cancelButton":
         core.gamePlayManager.cancelPurchase();

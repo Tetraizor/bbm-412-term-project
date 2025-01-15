@@ -2,12 +2,14 @@ import Component from "./component.js";
 import ForceField from "./forceField.js";
 import Magnet from "./magnet.js";
 import core from "../core.js";
+import UIManager from "../uiManager.js";
 
 export default class GamePlayManager extends Component {
   magnets = [];
   spheres = [];
   forceFields = [];
   placableSpaces = [];
+  lava = [];
   vacuum = null;
 
   renderers = [];
@@ -27,12 +29,36 @@ export default class GamePlayManager extends Component {
         magnetType: "positive",
       },
     },
+    strongPositiveMagnet: {
+      price: 10,
+      type: "strongMagnet",
+      properties: {
+        magnetType: "positive",
+        strength: 2,
+      },
+    },
+    strongNegativeMagnet: {
+      price: 10,
+      type: "strongMagnet",
+      properties: {
+        magnetType: "negative",
+        strength: 2,
+      },
+    },
     spinningMagnet: {
       price: 10,
       type: "spinningMagnet",
       properties: {
         rotationSpeed: 0.1,
       },
+    },
+    cube: {
+      price: 5,
+      type: "cube",
+    },
+    ramp: {
+      price: 5,
+      type: "ramp",
     },
   };
 
@@ -53,6 +79,10 @@ export default class GamePlayManager extends Component {
     });
 
     this.vacuum.registerSphere(sphere);
+
+    this.lava.forEach((lava) => {
+      lava.registerSphere(sphere);
+    });
   }
 
   registerPlacableSpace(space) {
@@ -64,6 +94,14 @@ export default class GamePlayManager extends Component {
 
     this.spheres.forEach((sphere) => {
       forceField.registerSphere(sphere);
+    });
+  }
+
+  registerLava(lava) {
+    this.lava.push(lava);
+
+    this.spheres.forEach((sphere) => {
+      lava.registerSphere(sphere);
     });
   }
 
@@ -88,7 +126,10 @@ export default class GamePlayManager extends Component {
 
     this.forceFields.forEach((forceField) => {
       forceField.unregisterSphere(sphere);
-      this.vacuum.unregisterSphere(sphere);
+    });
+    this.vacuum.unregisterSphere(sphere);
+    this.lava.forEach((lava) => {
+      lava.unregisterSphere(sphere);
     });
   }
 
@@ -205,7 +246,19 @@ export default class GamePlayManager extends Component {
     }, 300);
   }
 
-  update() {}
+  gameRunning = true;
+
+  update() {
+    if (this.gameRunning) {
+      if (core.time < 10000) {
+        document.getElementById("timer").innerText =
+          "Time: 0" + (core.time / 1000).toFixed(2);
+      } else {
+        document.getElementById("timer").innerText =
+          "Time: " + (core.time / 1000).toFixed(2);
+      }
+    }
+  }
 
   registerRenderer(renderer) {
     this.renderers.push(renderer);
@@ -236,5 +289,35 @@ export default class GamePlayManager extends Component {
     }
 
     this.updateUI();
+  }
+
+  won() {
+    console.log("You won!");
+    core.audioManager.playSFX("won");
+
+    core.uiManager.toggle("won");
+
+    let score = this.spheresLeft * 1000;
+    score += this.components * 50;
+    score += 2000 - 20 * (core.time / 1000);
+
+    document.getElementById("score").innerText = score.toFixed(0);
+    document.getElementById("spheresLeft").innerText =
+      this.spheresLeft.toFixed(0).toString() + " seconds";
+    document.getElementById("componentsLeft").innerText =
+      this.components.toFixed(0);
+    document.getElementById("timeLeft").innerText = (core.time / 1000).toFixed(
+      2
+    );
+
+    this.gameRunning = false;
+  }
+
+  loose() {
+    console.log("You lost!");
+
+    core.uiManager.toggle("lost");
+
+    this.gameRunning;
   }
 }

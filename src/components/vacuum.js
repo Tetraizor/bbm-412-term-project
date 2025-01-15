@@ -79,5 +79,9 @@ export default class Vacuum extends Component {
 
       sphere.gameObject.transform.setPosition(interpolatedPosition);
     });
+
+    setTimeout(() => {
+      core.gamePlayManager.won();
+    }, 2000);
   }
 }

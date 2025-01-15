@@ -4,6 +4,7 @@ import Component from "./component.js";
 import core from "../core.js";
 
 import { Vector3 } from "three";
+import { runForSeconds } from "../utils/asyncUtils.js";
 
 export default class CameraManager extends Component {
   coreCamera = null;
@@ -100,6 +101,12 @@ export default class CameraManager extends Component {
         this.mouseStart.y = event.clientY;
       }
     });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key == "c") {
+        this.goToNames();
+      }
+    });
   }
 
   update() {
@@ -162,18 +169,8 @@ export default class CameraManager extends Component {
     this.gameObject.transform.position.y += this.velocity.y * deltaTime;
     this.gameObject.transform.position.z += this.velocity.z * deltaTime;
 
-    if (this.gameObject.transform.position.x < -9)
-      this.gameObject.transform.position.x = -9;
-    if (this.gameObject.transform.position.x > 9)
-      this.gameObject.transform.position.x = 9;
-    if (this.gameObject.transform.position.z < -9)
-      this.gameObject.transform.position.z = -9;
-    if (this.gameObject.transform.position.z > 9)
-      this.gameObject.transform.position.z = 9;
     if (this.gameObject.transform.position.y < -9)
       this.gameObject.transform.position.y = -9;
-    if (this.gameObject.transform.position.y > 9)
-      this.gameObject.transform.position.y = 9;
 
     // Update camera position and rotation
     this.coreCamera.position.set(
@@ -204,5 +201,69 @@ export default class CameraManager extends Component {
       .multiplyScalar(velocityVec.dot(forwardVec));
 
     return projection;
+  }
+
+  nameStatus = false;
+  oldPosition = new Vector3(0, 0, 0);
+  oldRotation = new Vector3(0, 0, 0);
+
+  goToNames() {
+    this.nameStatus = !this.nameStatus;
+
+    if (this.nameStatus) {
+      this.oldPosition = this.gameObject.transform.position.clone();
+      this.oldRotation = this.gameObject.transform.rotation.clone();
+
+      const targetPosition = new Vector3(9.777, 11.646, 11.3666);
+      const targetRotation = new Vector3(-0.8224, 0.203, 0.2139);
+
+      runForSeconds(1, (timeLeft) => {
+        const progress = (1 - timeLeft) / 1;
+
+        const currentPosition = this.oldPosition
+          .clone()
+          .lerp(targetPosition, progress);
+
+        const currentRotation = this.oldRotation
+          .clone()
+          .lerp(targetRotation, progress);
+
+        this.gameObject.transform.setPosition(currentPosition);
+        this.gameObject.transform.setRotation(currentRotation);
+
+        this.coreCamera.rotation.set(
+          currentRotation.x,
+          currentRotation.y,
+          currentRotation.z
+        );
+      });
+    } else {
+      const targetPosition = this.oldPosition;
+      const targetRotation = this.oldRotation;
+
+      const startPosition = new Vector3(9.777, 11.646, 11.3666);
+      const startRotation = new Vector3(-0.8224, 0.203, 0.2139);
+
+      runForSeconds(1, (timeLeft) => {
+        const progress = (1 - timeLeft) / 1;
+
+        const currentPosition = startPosition
+          .clone()
+          .lerp(targetPosition, progress);
+
+        const currentRotation = startRotation
+          .clone()
+          .lerp(targetRotation, progress);
+
+        this.gameObject.transform.setPosition(currentPosition);
+        this.gameObject.transform.setRotation(currentRotation);
+
+        this.coreCamera.rotation.set(
+          currentRotation.x,
+          currentRotation.y,
+          currentRotation.z
+        );
+      });
+    }
   }
 }

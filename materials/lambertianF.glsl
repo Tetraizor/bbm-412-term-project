@@ -13,6 +13,7 @@ uniform vec3 baseColor;
 uniform vec3 overlayColor;
 uniform float opacity;
 uniform sampler2D baseTexture;
+uniform vec2 textureOffset;
 
 out vec4 fragColor;
 
@@ -26,7 +27,8 @@ void main() {
     vec3 shadedColor = vec3(ambientColor * ambientIntensity + 
                 lambertianFactor * lightColor * lightIntensity * 1.8);
     
-    vec3 finalColor = mix(baseColor * shadedColor * texture2D(baseTexture, vUv).xyz, vec3(0.0, 0.0, 0.0), 1.0 - fogFactor);
+    vec2 offsetUv = vUv + textureOffset;
+    vec3 finalColor = mix(baseColor * shadedColor * texture2D(baseTexture, offsetUv).xyz, vec3(0.0, 0.0, 0.0), 1.0 - fogFactor);
 
     fragColor =  vec4(finalColor * overlayColor * opacity, 1.0);
 }

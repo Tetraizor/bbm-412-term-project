@@ -8,6 +8,8 @@ uniform vec3 baseColor;
 uniform vec3 overlayColor;
 uniform sampler2D baseTexture;
 
+uniform vec2 textureOffset;
+
 uniform float opacity;
 
 varying vec3 vNormal;
@@ -61,7 +63,9 @@ void main() {
     }
 
     vec3 shadedColor = toonFactor + ambientColor * ambientIntensity;
-    vec4 textureColor = texture2D(baseTexture, vUv);
+    
+    vec2 offsetUv = vUv + textureOffset;
+    vec4 textureColor = texture2D(baseTexture, offsetUv);
         
     vec4 finalColor = vec4(shadedColor, 1.0) * textureColor * vec4(baseColor.xyz * overlayColor.xyz, opacity);
 

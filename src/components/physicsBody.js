@@ -4,6 +4,7 @@ import { Vector3, Euler, Quaternion } from "three";
 import core from "../core.js";
 import GizmoRenderer from "./gizmoRenderer.js";
 import { getRandomHexColor } from "../utils/colorUtils.js";
+import * as THREE from "three";
 
 export default class PhysicsBody extends Component {
   mass = 0;
@@ -11,18 +12,21 @@ export default class PhysicsBody extends Component {
   shape = null;
   shapeWrapper = null;
   showGizmo = false;
+  geometry = null;
 
   constructor({
     mass = 0,
     shape = null,
     showGizmo = false,
     collisionResponse = true,
+    geometry,
   }) {
     super();
 
     this.mass = mass;
     this.showGizmo = showGizmo;
     this.shapeWrapper = shape;
+    this.geometry = geometry;
 
     switch (shape.type) {
       case "box":
@@ -36,6 +40,17 @@ export default class PhysicsBody extends Component {
       case "plane":
         this.shape = new CANNON.Plane(new CANNON.Vec3());
         break;
+      case "custom":
+        const positions = geometry.attributes.position.array;
+        const indices = [];
+        for (let i = 0; i < positions.length / 3; i++) {
+          indices.push(i * 3, i * 3 + 1, i * 3 + 2);
+        }
+
+        const cannonShape = new CANNON.Trimesh(positions, indices);
+
+        this.shape = cannonShape;
+        break;
     }
 
     this.body = new CANNON.Body({
@@ -45,9 +60,6 @@ export default class PhysicsBody extends Component {
     });
 
     core.world.addBody(this.body);
-
-    switch (this.shape.type) {
-    }
   }
 
   start() {
@@ -88,6 +100,16 @@ export default class PhysicsBody extends Component {
           );
         }
         break;
+      case "custom":
+        if (this.showGizmo) {
+          this.gameObject.addComponent(
+            new GizmoRenderer({
+              color: getRandomHexColor(),
+              type: "custom",
+              geometry: this.geometry,
+            })
+          );
+        }
     }
 
     this.gameObject.transform.addListener("onPositionChanged", (event) => {

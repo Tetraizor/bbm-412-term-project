@@ -8,6 +8,8 @@ export default class AudioManager extends Component {
       vacuumIn: new Audio("audio/vacuum_in.wav"),
       vacuumOut: new Audio("audio/vacuum_out.wav"),
       metalPlace: new Audio("audio/metal_place.mp3"),
+      sizzle: new Audio("audio/sizzle.wav"),
+      won: new Audio("audio/won.mp3"),
     },
   };
 

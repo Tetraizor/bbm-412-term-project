@@ -3,6 +3,7 @@ import Renderer from "./renderer.js";
 import core from "../core.js";
 import { Vector3 } from "three";
 import PhysicsBody from "./physicsBody.js";
+import engine from "../engine.js";
 
 export default class EnergySphere extends Component {
   shell = null;
@@ -28,5 +29,11 @@ export default class EnergySphere extends Component {
     this.shell.transform.setScale(
       new Vector3(1, 1, 1).multiplyScalar(0.75 + multiplier * 0.15)
     );
+  }
+
+  destroy() {
+    engine.destroy(this.shell.id);
+
+    core.gamePlayManager.updateUI();
   }
 }

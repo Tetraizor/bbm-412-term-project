@@ -15,6 +15,7 @@ export default {
   objectSpawner: null,
   gamePlayManager: null,
   audioManager: null,
+  uiManager: null,
 
   // CANNON.js
   world: null,
@@ -26,7 +27,7 @@ export default {
   skyboxMaterial: null,
   cloud: null,
 
-  debugMode: true,
+  debugMode: document.location.search.includes("debug"),
 
   time: 0,
   lastTime: 0,

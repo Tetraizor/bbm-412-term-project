@@ -31,6 +31,9 @@
       <p id="fpsCounter">FPS: 60</p>
       <p id="deltaCounter">Delta Time: 0.66ms</p>
     </div>
+    <div class="timerMenu uiCard">
+      <h1 id="timer">00.37</h1>
+    </div>
     <div class="modalController hidden">
       <div class="modal help hidden" id="help">
         <h3>Controls</h3>
@@ -46,6 +49,20 @@
           Collect required amount of energy spheres on the back funnel to
           complete the level!
         </p>
+      </div>
+      <div id="won" class="modal won hidden" id="help">
+        <h3>Mission Completed!</h3>
+        <div class="divider"></div>
+        <p>Time: <span id="timeLeft">00.37</span></p>
+        <p>Components: <span id="componentsLeft">32</span></p>
+        <p>Spheres Left: <span id="spheresLeft"></span></p>
+        <p>Total Score: <span id="score"></span></p>
+        <br />
+        <button id="nextLevelButton">Next Level</button>
+        <button id="exploreThisLevel">Keep Exploring This Level</button>
+      </div>
+      <div id="lost" class="modal lost hidden" id="help">
+        <h3>You Lost...</h3>
       </div>
     </div>
     <!-- Toggle Sidebar Button -->
@@ -80,9 +97,96 @@
           <h3>Buy Items</h3>
           <button id="cancelButton">Cancel</button>
           <div id="buyButtons">
-            <button id="buyButton1">Negative Magnet</button>
-            <button id="buyButton2">Positive Magnet</button>
-            <button id="buyButton3">Spinning Magnet</button>
+            <button id="buyButton1" class="buyButton">
+              <img src="image/negativeMagnet.png" alt="Negative Magnet" />
+              <div
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  justify-content: start;
+                  align-items: start;
+                  margin-left: 1rem;
+                "
+              >
+                <h3><b>Negative Magnet</b></h3>
+                <p style="margin-top: 0.6rem">8 Components</p>
+              </div>
+            </button>
+            <button id="buyButton2" class="buyButton">
+              <img src="image/negativeMagnet.png" alt="Negative Magnet" />
+              <div
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  justify-content: start;
+                  align-items: start;
+                  margin-left: 1rem;
+                "
+              >
+                <h3><b>Positive Magnet</b></h3>
+                <p style="margin-top: 0.6rem">8 Components</p>
+              </div>
+            </button>
+            <button id="buyButton3" class="buyButton">
+              <img src="image/negativeMagnet.png" alt="Negative Magnet" />
+              <div
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  justify-content: start;
+                  align-items: start;
+                  margin-left: 1rem;
+                "
+              >
+                <h3><b>Strong Negative Magnet</b></h3>
+                <p style="margin-top: 0.6rem">12 Components</p>
+              </div>
+            </button>
+            <button id="buyButton4" class="buyButton">
+              <img src="image/negativeMagnet.png" alt="Negative Magnet" />
+              <div
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  justify-content: start;
+                  align-items: start;
+                  margin-left: 1rem;
+                "
+              >
+                <h3><b>Strong Positive Magnet</b></h3>
+                <p style="margin-top: 0.6rem">12 Components</p>
+              </div>
+            </button>
+            <button id="buyButton6" class="buyButton">
+              <img src="image/negativeMagnet.png" alt="Negative Magnet" />
+              <div
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  justify-content: start;
+                  align-items: start;
+                  margin-left: 1rem;
+                "
+              >
+                <h3><b>Cube</b></h3>
+                <p style="margin-top: 0.6rem">20 Components</p>
+              </div>
+            </button>
+            <button id="buyButton7" class="buyButton">
+              <img src="image/negativeMagnet.png" alt="Negative Magnet" />
+              <div
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  justify-content: start;
+                  align-items: start;
+                  margin-left: 1rem;
+                "
+              >
+                <h3><b>Ramp</b></h3>
+                <p style="margin-top: 0.6rem">25 Components</p>
+              </div>
+            </button>
           </div>
         </div>
         <div id="tab2" class="category-content hidden" id="category2">
