@@ -3,120 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BBM 412 - Term Project</title>
+    <title>Game Intro</title>
     <link rel="stylesheet" href="assets/index.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap"
-      rel="stylesheet"
-    />
-    <script type="importmap">
-      {
-        "imports": {
-          "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
-          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
-          "three/examples/jsm/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
-          "cannon-es": "https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/+esm"
-        }
-      }
-    </script>
   </head>
-
   <body>
-    <canvas id="webgl"></canvas>
-    <div class="debugMenu uiCard">
-      <h3>Debug Menu</h3>
-      <div class="divider"></div>
-      <p id="fpsCounter">FPS: 60</p>
-      <p id="deltaCounter">Delta Time: 0.66ms</p>
-    </div>
-    <div class="modalController hidden">
-      <div class="modal help hidden" id="help">
-        <h3>Controls</h3>
-        <div class="divider"></div>
-        <p>Look: Hold RMB + Drag</p>
-        <p>Fly: WASD</p>
+    <div class="intro-container">
+      <div class="hero-section">
+        <h1 class="game-title">🎮 Welcome to the Adventure!</h1>
+        <p class="game-subtitle">Choose your path and start the journey.</p>
       </div>
-      <div class="modal settings hidden" id="settings">
-        <h2>Settings</h2>
-        <div class="divider"></div>
-        <h3>Light Direction</h3>
-        <div
-          style="
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-          "
-        >
-          <label for="lightX" style="margin-right: 0.4rem">X</label>
-          <input
-            type="range"
-            id="lightX"
-            name="lightX"
-            min="-1"
-            max="1"
-            step="0.01"
-            value="-.6"
-          />
-          <label for="lightY" style="margin-right: 0.4rem">Y</label>
-          <input
-            type="range"
-            id="lightY"
-            name="lightY"
-            min="-1"
-            max="1"
-            step="0.01"
-            value="0"
-          />
-          <label for="lightZ" style="margin-right: 0.4rem">Z</label>
-          <input
-            type="range"
-            id="lightZ"
-            name="lightZ"
-            min="-1"
-            max="1"
-            step="0.01"
-            value="-.6"
-          />
-        </div>
+      <div class="button-container">
+        <button class="level-button" id="practice-room">Practice Room</button>
+        <button class="level-button" id="level-1">Level 1</button>
+        <button class="level-button" id="level-2">Level 2</button>
       </div>
     </div>
-    <!-- Toggle Sidebar Button -->
-    <button id="toggleSidebar" class="toggle-button">☰</button>
-
-    <!-- Sidebar -->
-    <div id="sidebar" class="sidebar hidden">
-      <div class="sidebar-header">
-        <h2>Categories</h2>
-      </div>
-      <div class="sidebar-categories">
-        <button class="category-tab" data-category="category1">Category 1</button>
-        <button class="category-tab" data-category="category2">Category 2</button>
-        <button class="category-tab" data-category="category3">Category 3</button>
-      </div>
-      <div id="sidebar-content" class="sidebar-content">
-        <!-- Default content or Category 1 buttons -->
-        <div class="category-content" id="category1">
-          <button id="createEnergySphereButton">Create Energy Sphere</button>
-          <button>Button 2</button>
-          <button>Button 3</button>
-        </div>
-        <div class="category-content hidden" id="category2">
-          <button>Button A</button>
-          <button>Button B</button>
-          <button>Button C</button>
-        </div>
-        <div class="category-content hidden" id="category3">
-          <button>Option X</button>
-          <button>Option Y</button>
-          <button>Option Z</button>
-        </div>
-      </div>
-    </div>
-    <script type="module" src="src/sidebar.js"></script>
-    <script type="module" src="src/main.js"></script>
+    <script src="src/start.js"></script>
   </body>
 </html>

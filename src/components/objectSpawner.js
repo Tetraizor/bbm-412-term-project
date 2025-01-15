@@ -14,7 +14,8 @@ import ForceField from "./forceField.js";
 
 export default class ObjectSpawner extends Component {
   materials = {
-    magnet: null,
+    magnetPositive: null,
+    magnetNegative: null,
   };
 
   models = {
@@ -26,36 +27,56 @@ export default class ObjectSpawner extends Component {
   }
 
   start() {
-    this.materials.magnet = ResourceManager.getMaterial("toon");
+    this.materials.magnetPositive = ResourceManager.getMaterial("toon");
+    this.materials.magnetNegative = ResourceManager.getMaterial("toon").clone();
     this.models.magnet =
       ResourceManager.getModel("magnet").children[0].geometry;
 
-    const magnetTexture = ResourceManager.getTexture("magnetTexture");
-    magnetTexture.magFilter = magnetTexture.minFilter = THREE.NearestFilter;
+    const magnetTexturePositive = ResourceManager.getTexture(
+      "positiveMagnetTexture"
+    );
+    magnetTexturePositive.magFilter = magnetTexturePositive.minFilter =
+      THREE.NearestFilter;
 
-    this.materials.magnet.uniforms.baseTexture.value =
-      ResourceManager.getTexture("magnetTexture");
+    this.materials.magnetPositive.uniforms.baseTexture.value =
+      magnetTexturePositive;
+
+    const magnetTextureNegative = ResourceManager.getTexture(
+      "negativeMagnetTexture"
+    );
+    magnetTextureNegative.magFilter = magnetTextureNegative.minFilter =
+      THREE.NearestFilter;
+
+    this.materials.magnetNegative.uniforms.baseTexture.value =
+      magnetTextureNegative;
   }
 
-  spawnObject(position, object, properties) {
-    switch (object) {
+  spawnObject(position, object) {
+    console.log("Spawning object", object);
+
+    switch (object.type) {
       case "magnet":
-        return this.createMagnet({ position, properties });
-        break;
+        return this.createMagnet({ position, object });
       case "energySphere":
         return this.createEnergySphere();
-        break;
     }
   }
 
-  createMagnet({ position, properties = { magnetType: "positive" } }) {
+  createMagnet({ position, object }) {
+    const magnetMaterial =
+      object.properties.magnetType === "negative"
+        ? this.materials.magnetNegative.clone()
+        : this.materials.magnetPositive.clone();
+
     const magnet = new GameObject(
       "Magnet",
       [
         new Renderer({
           geometry: this.models.magnet,
-          material: this.materials.magnet.clone(),
           outlineOverride: 1.15,
+          material: magnetMaterial,
+          defaultOverlayColor: new THREE.Vector3(1.8, 1.3, 1.3),
+          highlightOutlineColor: new THREE.Vector3(1, 0.3, 0.3),
         }),
         new PhysicsBody({
           mass: 0,
@@ -67,7 +88,7 @@ export default class ObjectSpawner extends Component {
           },
           showGizmo: core.debugMode,
         }),
-        new Magnet({ magnetType: properties.magnetType }),
+        new Magnet({ type: object.properties.magnetType }),
       ],
       ["magnet"]
     );

@@ -14,6 +14,8 @@ export default class Renderer extends Component {
   OUTLINE_THICKNESS = 1.01;
   outlineOverride = 1;
 
+  defaultOverlayColor = new THREE.Vector3(1.4, 1.4, 1.4);
+
   defaultOutlineColor = new THREE.Vector3(0.15, 0.15, 0.1);
   highlightOutlineColor = new THREE.Vector3(1, 1, 0.5);
 
@@ -25,6 +27,8 @@ export default class Renderer extends Component {
     material,
     outlineOverride = 1,
     hideOutline = false,
+    defaultOverlayColor = new THREE.Vector3(1.4, 1.4, 1.4),
+    highlightOutlineColor = new THREE.Vector3(1, 1, 0.5),
   }) {
     super();
 
@@ -35,6 +39,8 @@ export default class Renderer extends Component {
     this.material = material;
     this.outlineOverride = outlineOverride;
     this.hideOutline = hideOutline;
+    this.defaultOverlayColor = defaultOverlayColor;
+    this.highlightOutlineColor = highlightOutlineColor;
 
     if (geometry.isObject3D) {
       this.mesh = new THREE.Mesh(geometry.geometry, this.material);
@@ -166,7 +172,7 @@ export default class Renderer extends Component {
   toggleOutline(state) {
     if (state) {
       this.targetOutlineColor = this.highlightOutlineColor;
-      this.targetOverlayColor = new THREE.Vector3(1.5, 1.5, 1.5);
+      this.targetOverlayColor = this.defaultOverlayColor;
     } else {
       this.targetOutlineColor = new THREE.Vector3(0, 0, 0);
       this.targetOverlayColor = new THREE.Vector3(1, 1, 1);
@@ -198,6 +204,9 @@ export default class Renderer extends Component {
   }
 
   destroy() {
+    super.destroy();
+
     core.removeMesh(this.mesh);
+    core.removeMesh(this.outlineMesh);
   }
 }

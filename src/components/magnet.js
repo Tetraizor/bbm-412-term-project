@@ -12,16 +12,20 @@ import GamePlayManager from "./gameplayManager.js";
 export default class Magnet extends Component {
   forceField = null;
 
-  magnetType = null;
+  type = null;
   width = 1;
   height = 2;
 
-  constructor({ magnetType, width = 1, height = 2 }) {
+  highlighting = false;
+
+  constructor({ type, width = 1, height = 2 }) {
     super();
 
-    this.magnetType = magnetType;
+    this.type = type;
     this.width = width;
     this.height = height;
+
+    console.log(type);
   }
 
   start() {
@@ -48,13 +52,23 @@ export default class Magnet extends Component {
       (result) => {
         if (result.type === "enter") {
           this.gameObject.getComponent(Renderer).toggleOutline(true);
+          this.highlighting = true;
         }
 
         if (result.type === "exit") {
           this.gameObject.getComponent(Renderer).toggleOutline(false);
+          this.highlighting = false;
         }
       }
     );
+
+    core.inputManager.addListener("mouseDown", (event) => {
+      if (event.clickId !== 0) return;
+
+      if (this.highlighting) {
+        engine.destroy(this.gameObject.id);
+      }
+    });
 
     this.forceField = new GameObject(
       "ForceField",
@@ -74,6 +88,7 @@ export default class Magnet extends Component {
           magnet: this,
           length: this.height,
           width: this.width,
+          type: this.type,
         }),
       ],
       ["forceField"]
@@ -86,5 +101,13 @@ export default class Magnet extends Component {
     this.forceField.transform.rotation.copy(this.gameObject.transform.rotation);
 
     engine.instantiate(this.forceField);
+  }
+
+  destroy() {
+    core.gamePlayManager.unregisterForceField(
+      this.forceField.getComponent(ForceField)
+    );
+
+    engine.destroy(this.forceField.id);
   }
 }

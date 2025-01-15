@@ -16,6 +16,9 @@ export default class PlacableSpace extends Component {
 
   objectState = null;
 
+  isSpawning = false;
+  spawningObject = null;
+
   objectBeingSpawned = null;
   objectSpawnLocation = new Vector3();
   currentLocation = new Vector3();
@@ -39,8 +42,6 @@ export default class PlacableSpace extends Component {
           position:
             this.objectState?.point.add(new Vector3(0.0, 0.06, 0.0)) ||
             this.gameObject.transform.position,
-          object: "magnet",
-          properties: { magnetType: "positive" },
         });
       }
     });
@@ -66,10 +67,17 @@ export default class PlacableSpace extends Component {
     this.cursor.scale.set(0.25, 0.25, 1);
 
     core.scene.add(this.cursor);
+    this.cursor.visible = false;
+
+    core.gamePlayManager.registerPlacableSpace(this);
   }
 
   checkHover(result) {
     if (result.type == "enter") {
+      if (!this.isSpawning) {
+        return;
+      }
+
       if (this.renderer.outlineMaterial) {
         this.renderer.toggleOutline(true);
       }
@@ -123,11 +131,29 @@ export default class PlacableSpace extends Component {
     }
   }
 
-  attemptSpawnObject({ position, object, properties }) {
+  attemptSpawnObject({ position }) {
     this.objectBeingSpawned = this.objectSpawner.spawnObject(
       position,
-      object,
-      properties
+      this.spawningObject
     );
+
+    core.gamePlayManager.acceptPurchase({ item: this.spawningObject });
+
+    this.spawningObject = null;
+    this.isSpawning = false;
+
+    this.cursor.visible = false;
+  }
+
+  setSpawningObject(object) {
+    this.spawningObject = object;
+    this.isSpawning = true;
+  }
+
+  cancelSpawn() {
+    this.spawningObject = null;
+    this.isSpawning = false;
+
+    this.cursor.visible = false;
   }
 }

@@ -1,8 +1,10 @@
 export default class Component {
-    gameObject = null;
-    isComponent = true;
+  gameObject = null;
+  isComponent = true;
 
-    start() { }
+  start() {}
 
-    update() { }
+  update() {}
+
+  destroy() {}
 }

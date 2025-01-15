@@ -1,3 +1,5 @@
+import core from "./core.js";
+
 export default class UIManager {
   constructor() {
     this.initialize();
@@ -8,13 +10,31 @@ export default class UIManager {
     settings: false,
   };
 
+  buttons = {
+    settingsButton: document.getElementById("settingsButton"),
+
+    // Tabs
+    tabButton1: document.getElementById("tabButton1"),
+    tabButton2: document.getElementById("tabButton2"),
+    tabButton3: document.getElementById("tabButton3"),
+
+    // Buy Menu
+    cancelButton: document.getElementById("cancelButton"),
+
+    buyButton1: document.getElementById("buyButton1"),
+    buyButton2: document.getElementById("buyButton2"),
+    buyButton3: document.getElementById("buyButton3"),
+  };
+
   panels = {
     help: {
       root: document.getElementById("help"),
     },
-    settings: {
-      root: document.getElementById("settings"),
-    },
+  };
+
+  settings = {
+    root: document.getElementById("settings"),
+    state: false,
   };
 
   background = document.getElementsByClassName("modalController")[0];
@@ -66,6 +86,76 @@ export default class UIManager {
 
     for (let key in this.states) {
       this.toggleForce(key, false);
+    }
+
+    for (let key in this.buttons) {
+      if (!this.buttons[key]) {
+        console.error(`Button ${key} not found`);
+        return;
+      }
+
+      this.buttons[key].addEventListener("click", () => {
+        this.onButtonPressed(key);
+      });
+    }
+  }
+
+  toggleSettings() {
+    this.settings.state = !this.settings.state;
+
+    if (!this.settings.state) {
+      this.settings.root.classList.remove("visible");
+      this.buttons.settingsButton.classList.remove("active");
+    } else {
+      this.settings.root.classList.add("visible");
+      this.buttons.settingsButton.classList.add("active");
+    }
+  }
+
+  onButtonPressed(button) {
+    switch (button) {
+      case "settingsButton":
+        this.toggleSettings();
+        break;
+      case "tabButton1":
+        document.getElementById("tab1").classList.remove("hidden");
+        document.getElementById("tab2").classList.add("hidden");
+        document.getElementById("tab3").classList.add("hidden");
+
+        document.getElementById("tabButton1").classList.add("active");
+        document.getElementById("tabButton2").classList.remove("active");
+        document.getElementById("tabButton3").classList.remove("active");
+        break;
+      case "tabButton2":
+        document.getElementById("tab1").classList.add("hidden");
+        document.getElementById("tab2").classList.remove("hidden");
+        document.getElementById("tab3").classList.add("hidden");
+
+        document.getElementById("tabButton1").classList.remove("active");
+        document.getElementById("tabButton2").classList.add("active");
+        document.getElementById("tabButton3").classList.remove("active");
+        break;
+      case "tabButton3":
+        document.getElementById("tab1").classList.add("hidden");
+        document.getElementById("tab2").classList.add("hidden");
+        document.getElementById("tab3").classList.remove("hidden");
+
+        document.getElementById("tabButton1").classList.remove("active");
+        document.getElementById("tabButton2").classList.remove("active");
+        document.getElementById("tabButton3").classList.add("active");
+        break;
+      case "buyButton1":
+        core.gamePlayManager.buyItem({ item: "negativeMagnet" });
+        break;
+      case "buyButton2":
+        core.gamePlayManager.buyItem({ item: "positiveMagnet" });
+        break;
+      case "buyButton3":
+        core.gamePlayManager.buyItem({ item: "spinningMagnet" });
+        break;
+      case "cancelButton":
+        core.gamePlayManager.cancelPurchase();
+        break;
     }
   }
 }

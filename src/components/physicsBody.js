@@ -145,4 +145,10 @@ export default class PhysicsBody extends Component {
       "physicsBody"
     );
   }
+
+  destroy() {
+    super.destroy();
+
+    core.world.removeBody(this.body);
+  }
 }

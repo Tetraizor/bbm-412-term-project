@@ -1,23 +1,161 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Game Intro</title>
-  <link rel="stylesheet" href="assets/start.css">
-</head>
-<body>
-<div class="intro-container">
-  <div class="hero-section">
-    <h1 class="game-title">🎮 Welcome to the Adventure!</h1>
-    <p class="game-subtitle">Choose your path and start the journey.</p>
-  </div>
-  <div class="button-container">
-    <button class="level-button" id="practice-room">Practice Room</button>
-    <button class="level-button" id="level-1">Level 1</button>
-    <button class="level-button" id="level-2">Level 2</button>
-  </div>
-</div>
-<script src="src/start.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BBM 412 - Term Project</title>
+    <link rel="stylesheet" href="assets/start.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
+          "three/examples/jsm/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
+          "cannon-es": "https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/+esm"
+        }
+      }
+    </script>
+  </head>
+
+  <body>
+    <canvas id="webgl"></canvas>
+    <div class="debugMenu uiCard">
+      <h3>Debug Menu</h3>
+      <div class="divider"></div>
+      <p id="fpsCounter">FPS: 60</p>
+      <p id="deltaCounter">Delta Time: 0.66ms</p>
+    </div>
+    <div class="modalController hidden">
+      <div class="modal help hidden" id="help">
+        <h3>Controls</h3>
+        <div class="divider"></div>
+        <p>Look: Hold RMB + Drag</p>
+        <p>Fly: WASD</p>
+        <p>Place objects to manipulate energy spheres.</p>
+        <p>
+          When you're ready, interact with the front funnel to generate an
+          energy sphere.
+        </p>
+        <p>
+          Collect required amount of energy spheres on the back funnel to
+          complete the level!
+        </p>
+      </div>
+    </div>
+    <!-- Toggle Sidebar Button -->
+    <button id="settingsButton" class="toggle-button">☰</button>
+
+    <!-- Sidebar -->
+    <div id="settings" class="sidebar hidden">
+      <div class="sidebar-header">
+        <h2>Menu</h2>
+      </div>
+      <div class="sidebar-categories">
+        <button id="tabButton1" class="category-tab active">Buy Items</button>
+        <button id="tabButton2" class="category-tab">Help</button>
+        <button id="tabButton3" class="category-tab">Settings</button>
+      </div>
+      <div id="sidebar-content" class="sidebar-content">
+        <!-- Default content or Category 1 buttons -->
+        <div id="tab1" class="category-content" id="category1">
+          <div class="moneyContainer">
+            <h3 id="components">Components: 32</h3>
+          </div>
+          <div class="divider"></div>
+          <h3 style="margin-bottom: 0.8rem">Spheres Left</h3>
+          <div class="sphereContainer">
+            <div id="sphere1" class="sphere full"></div>
+            <div id="sphere2" class="sphere full"></div>
+            <div id="sphere3" class="sphere"></div>
+            <div id="sphere4" class="sphere"></div>
+            <div id="sphere5" class="sphere"></div>
+          </div>
+          <div class="divider"></div>
+          <h3>Buy Items</h3>
+          <button id="cancelButton">Cancel</button>
+          <div id="buyButtons">
+            <button id="buyButton1">Negative Magnet</button>
+            <button id="buyButton2">Positive Magnet</button>
+            <button id="buyButton3">Spinning Magnet</button>
+          </div>
+        </div>
+        <div id="tab2" class="category-content hidden" id="category2">
+          <h3>Controls</h3>
+          <div class="divider"></div>
+          <p>Look: Hold RMB + Drag</p>
+          <p>Fly: WASD</p>
+          <p>Place objects to manipulate energy spheres.</p>
+          <p>
+            When you're ready, interact with the front funnel to generate an
+            energy sphere.
+          </p>
+          <p>
+            Collect required amount of energy spheres on the back funnel to
+            complete the level!
+          </p>
+        </div>
+        <div id="tab3" class="category-content hidden" id="category3">
+          <h2>Settings</h2>
+          <div class="divider"></div>
+          <h3>Light Direction</h3>
+          <div
+            style="
+              display: flex;
+              flex-direction: column;
+              align-items: stretch;
+              justify-content: stretch;
+              width: 100%;
+            "
+          >
+            <div style="width: 100%; display: flex; flex-direction: row">
+              <label for="lightX" style="margin-right: 1rem">X</label>
+              <input
+                style="flex: 1"
+                type="range"
+                id="lightX"
+                name="lightX"
+                min="-1"
+                max="1"
+                step="0.01"
+                value="-.6"
+              />
+            </div>
+            <div style="width: 100%; display: flex; flex-direction: row">
+              <label for="lightY" style="margin-right: 1rem">Y</label>
+              <input
+                style="flex: 1"
+                type="range"
+                id="lightY"
+                name="lightY"
+                min="-1"
+                max="1"
+                step="0.01"
+                value="0"
+              />
+            </div>
+            <div style="width: 100%; display: flex; flex-direction: row">
+              <label for="lightZ" style="margin-right: 1rem">Z</label>
+              <input
+                style="flex: 1"
+                type="range"
+                id="lightZ"
+                name="lightZ"
+                min="-1"
+                max="1"
+                step="0.01"
+                value="-.6"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="src/main.js"></script>
+  </body>
 </html>

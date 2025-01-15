@@ -21,12 +21,21 @@ export default class ForceField extends Component {
 
   effectedList = [];
 
-  constructor({ magnet, length = 2, width = 1 }) {
+  type = null;
+
+  constructor({ magnet, length = 2, width = 1, type }) {
     super();
 
     this.magnet = magnet;
     this.length = length;
     this.width = width;
+    this.type = type;
+
+    if (type === "positiveMagnet") {
+      this.fieldDirection = new Vector3(0, 0, 1);
+    } else {
+      this.fieldDirection = new Vector3(0, 0, -1);
+    }
 
     const texture = ResourceManager.getTexture("forceFieldTexture");
     texture.wrapS = THREE.RepeatWrapping;
@@ -41,7 +50,7 @@ export default class ForceField extends Component {
     material.uniforms.length.value = this.length;
     material.uniforms.baseTexture.value = texture;
     material.uniforms.opacity.value = 0.5;
-    material.uniforms.direction.value = true;
+    material.uniforms.direction.value = type == "negative";
     material.depthWrite = false;
 
     const model = ResourceManager.getModel("forceField").children[0].geometry;
@@ -168,8 +177,17 @@ export default class ForceField extends Component {
 
     this.effectedList.forEach((sphere) => {
       sphere.physicsBody.body.applyForce(
-        this.fieldDirection.normalize().multiplyScalar(0.5)
+        this.fieldDirection
+          .normalize()
+          .multiplyScalar(0.5)
+          .multiplyScalar(this.type === "positive" ? -1 : 1)
       );
     });
+  }
+
+  destroy() {
+    super.destroy();
+
+    core.scene.remove(this.mesh);
   }
 }

@@ -22,7 +22,7 @@ export default {
   prerenderHooks: [],
   postrenderHooks: [],
 
-  debugMode: true,
+  debugMode: false,
 
   time: 0,
   lastTime: 0,

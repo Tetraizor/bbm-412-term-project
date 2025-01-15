@@ -8,6 +8,9 @@ export default class Dropper extends Component {
   renderer = null;
   isHovering = false;
 
+  cooldown = 1;
+  canSpawn = true;
+
   constructor() {
     super();
   }
@@ -41,9 +44,19 @@ export default class Dropper extends Component {
   }
 
   drop() {
-    core.objectSpawner.spawnObject(
-      this.gameObject.transform.position,
-      "energySphere"
-    );
+    if (core.gamePlayManager.spheresLeft <= 0) return;
+    if (!this.canSpawn) return;
+
+    this.canSpawn = false;
+    setTimeout(() => {
+      this.canSpawn = true;
+    }, this.cooldown * 1000);
+
+    core.gamePlayManager.spheresLeft--;
+    core.gamePlayManager.updateUI();
+
+    core.objectSpawner.spawnObject(this.gameObject.transform.position, {
+      type: "energySphere",
+    });
   }
 }

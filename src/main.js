@@ -73,7 +73,14 @@ async function loadResources() {
   await ResourceManager.loadTexture("cursor", "../textures/cursor.png");
   await ResourceManager.loadTexture("tableTexture", "../textures/table.png");
   await ResourceManager.loadTexture("whiteTexture", "../textures/white.png");
-  await ResourceManager.loadTexture("magnetTexture", "../textures/magnet.png");
+  await ResourceManager.loadTexture(
+    "positiveMagnetTexture",
+    "../textures/magnetPositive.png"
+  );
+  await ResourceManager.loadTexture(
+    "negativeMagnetTexture",
+    "../textures/magnetNegative.png"
+  );
   await ResourceManager.loadTexture("heightMap", "../textures/heightMap.png");
   await ResourceManager.loadTexture(
     "forceFieldTexture",
@@ -564,5 +571,3 @@ async function createAirship() {
 }
 
 await start();
-
-export { createEnergySphere };

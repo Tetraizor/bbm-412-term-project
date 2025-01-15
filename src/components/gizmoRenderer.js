@@ -208,5 +208,19 @@ export default class GizmoRenderer extends Component {
 
   destroy() {
     super.destroy();
+
+    switch (this.type) {
+      case "arrow":
+        core.scene.remove(this.arrow);
+        break;
+      case "plane":
+        core.scene.remove(this.plane);
+        break;
+      case "box":
+        core.scene.remove(this.box);
+        break;
+      case "sphere":
+        core.scene.remove(this.sphere);
+    }
   }
 }
