@@ -20,6 +20,8 @@ import Airship from "./components/airship.js";
 import Dropper from "./components/dropper.js";
 import PlacableSpace from "./components/placableSpace.js";
 import GamePlayManager from "./components/gameplayManager.js";
+import Vacuum from "./components/vacuum.js";
+import AudioManager from "./components/audioManager.js";
 
 const uiManager = new UIManager();
 
@@ -373,6 +375,15 @@ async function createInitialScene() {
   engine.instantiate(boundary3);
   engine.instantiate(boundary4);
 
+  const audioManager = new GameObject(
+    "AudioManager",
+    [new AudioManager()],
+    ["audioManager"]
+  );
+
+  engine.instantiate(audioManager);
+  core.audioManager = audioManager.getComponent(AudioManager);
+
   const spawner = new GameObject("Spawner", [new ObjectSpawner()], ["spawner"]);
 
   engine.instantiate(spawner);
@@ -391,6 +402,29 @@ async function createInitialScene() {
   engine.instantiate(raycastManager);
   core.raycast = raycastManager.getComponent(Raycast);
   core.objectSpawner = spawner.getComponent(ObjectSpawner);
+
+  const vacuum = new GameObject(
+    "Vacuum",
+    [
+      new PhysicsBody({
+        mass: 0,
+        shape: {
+          type: "box",
+          width: 0.3,
+          height: 0.3,
+          depth: 0.3,
+        },
+        showGizmo: core.debugMode,
+        collisionResponse: false,
+      }),
+      new Vacuum(),
+    ],
+    ["vacuum"]
+  );
+
+  vacuum.transform.setPosition(new Vector3(-1, 0.4, -2.5));
+
+  engine.instantiate(vacuum);
 
   const directionalLight = new GameObject(
     "DirectionalLight",

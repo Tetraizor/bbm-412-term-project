@@ -12,7 +12,6 @@ export default class Outline extends Component {
 
     this.renderer = renderer;
 
-    console.log(this.renderer.mesh.geometry);
     const geometry = ResourceManager.getModel("airship").children.find(
       (child) => child.name === "wing_l"
     ).geometry;

@@ -52,8 +52,6 @@ export default class ObjectSpawner extends Component {
   }
 
   spawnObject(position, object) {
-    console.log("Spawning object", object);
-
     switch (object.type) {
       case "magnet":
         return this.createMagnet({ position, object });
@@ -63,6 +61,8 @@ export default class ObjectSpawner extends Component {
   }
 
   createMagnet({ position, object }) {
+    core.audioManager.playSFX("metalPlace");
+
     const magnetMaterial =
       object.properties.magnetType === "negative"
         ? this.materials.magnetNegative.clone()

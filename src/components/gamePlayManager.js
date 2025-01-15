@@ -8,6 +8,7 @@ export default class GamePlayManager extends Component {
   spheres = [];
   forceFields = [];
   placableSpaces = [];
+  vacuum = null;
 
   itemDb = {
     negativeMagnet: {
@@ -48,6 +49,8 @@ export default class GamePlayManager extends Component {
     this.forceFields.forEach((forceField) => {
       forceField.registerSphere(sphere);
     });
+
+    this.vacuum.registerSphere(sphere);
   }
 
   registerPlacableSpace(space) {
@@ -62,6 +65,14 @@ export default class GamePlayManager extends Component {
     });
   }
 
+  registerVacuum(vacuum) {
+    this.vacuum = vacuum;
+
+    this.spheres.forEach((sphere) => {
+      vacuum.registerSphere(sphere);
+    });
+  }
+
   unregisterPlacableSpace(space) {
     this.placableSpaces = this.placableSpaces.filter((s) => s !== space);
   }
@@ -72,6 +83,11 @@ export default class GamePlayManager extends Component {
 
   unregisterSphere(sphere) {
     this.spheres = this.spheres.filter((s) => s !== sphere);
+
+    this.forceFields.forEach((forceField) => {
+      forceField.unregisterSphere(sphere);
+      this.vacuum.unregisterSphere(sphere);
+    });
   }
 
   buyItem({ item }) {

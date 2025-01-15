@@ -47,6 +47,8 @@ export default class Dropper extends Component {
     if (core.gamePlayManager.spheresLeft <= 0) return;
     if (!this.canSpawn) return;
 
+    core.audioManager.playSFX("vacuumOut");
+
     this.canSpawn = false;
     setTimeout(() => {
       this.canSpawn = true;

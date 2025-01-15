@@ -24,8 +24,6 @@ export default class Magnet extends Component {
     this.type = type;
     this.width = width;
     this.height = height;
-
-    console.log(type);
   }
 
   start() {

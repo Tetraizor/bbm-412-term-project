@@ -169,7 +169,6 @@ export default class PlacableSpace extends Component {
     this.spawningObject = object;
     this.isSpawning = true;
 
-    console.log(object);
     this.objectPreview.geometry.dispose();
     this.objectPreview.geometry =
       this.objectSpawner.models[object.type].clone();

@@ -68,8 +68,6 @@ export default class ForceField extends Component {
     this.renderer = this.gameObject.getComponent(Renderer);
     this.body = this.gameObject.getComponent(PhysicsBody).body;
 
-    console.log(this.body);
-
     this.magnet.gameObject.transform.addListener(
       "onPositionChanged",
       (event) => {
