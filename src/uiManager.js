@@ -24,6 +24,9 @@ export default class UIManager {
     buyButton1: document.getElementById("buyButton1"),
     buyButton2: document.getElementById("buyButton2"),
     buyButton3: document.getElementById("buyButton3"),
+
+    shaderButton1: document.getElementById("shaderButton1"),
+    shaderButton2: document.getElementById("shaderButton2"),
   };
 
   panels = {
@@ -80,7 +83,7 @@ export default class UIManager {
       }
 
       if (event.key == "Escape" || event.key == "Esc") {
-        this.toggle("settings");
+        this.toggleSettings();
       }
     });
 
@@ -155,6 +158,12 @@ export default class UIManager {
         break;
       case "cancelButton":
         core.gamePlayManager.cancelPurchase();
+        break;
+      case "shaderButton1":
+        core.gamePlayManager.setRenderingMode("toon");
+        break;
+      case "shaderButton2":
+        core.gamePlayManager.setRenderingMode("lambertian");
         break;
     }
   }

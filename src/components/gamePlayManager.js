@@ -10,6 +10,8 @@ export default class GamePlayManager extends Component {
   placableSpaces = [];
   vacuum = null;
 
+  renderers = [];
+
   itemDb = {
     negativeMagnet: {
       price: 5,
@@ -149,6 +151,15 @@ export default class GamePlayManager extends Component {
       document.getElementById("cancelButton").classList.add("hidden");
       document.getElementById("buyButtons").classList.remove("hidden");
     }
+
+    // Render Mode Buttons
+    if (this.renderingMode === "toon") {
+      document.getElementById("shaderButton1").classList.add("active");
+      document.getElementById("shaderButton2").classList.remove("active");
+    } else {
+      document.getElementById("shaderButton1").classList.remove("active");
+      document.getElementById("shaderButton2").classList.add("active");
+    }
   }
 
   updateSphereUI() {
@@ -187,7 +198,43 @@ export default class GamePlayManager extends Component {
 
   start() {
     this.updateUI();
+
+    setTimeout(() => {
+      console.log("Setting rendering mode to lambertian");
+      this.setRenderingMode("lambertian");
+    }, 300);
   }
 
   update() {}
+
+  registerRenderer(renderer) {
+    this.renderers.push(renderer);
+    renderer.changeRendererType(this.renderingMode);
+  }
+
+  renderingMode = "toon";
+
+  setRenderingMode(rendering) {
+    if (rendering == this.renderingMode) {
+      return;
+    }
+
+    if (this.renderingMode === "toon") {
+      this.renderingMode = "lambertian";
+    } else {
+      this.renderingMode = "toon";
+    }
+
+    if (this.renderingMode === "toon") {
+      this.renderers.forEach((renderer) => {
+        renderer.changeRendererType("toon");
+      });
+    } else {
+      this.renderers.forEach((renderer) => {
+        renderer.changeRendererType("lambertian");
+      });
+    }
+
+    this.updateUI();
+  }
 }

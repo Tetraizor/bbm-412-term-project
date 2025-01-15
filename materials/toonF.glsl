@@ -1,5 +1,3 @@
-uniform vec3 lightDirection;
-uniform vec3 lightPosition;
 uniform vec3 lightColor;
 uniform float lightIntensity;
 

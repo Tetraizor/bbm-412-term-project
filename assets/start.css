@@ -142,7 +142,7 @@ canvas {
 
 .divider {
   margin: 10px 0;
-  border-bottom: 1px solid rgb(255, 255, 255);
+  border-bottom: 0.5px solid rgb(104, 104, 104);
 }
 
 /* Sidebar Toggle Button */
@@ -215,11 +215,11 @@ canvas {
 }
 
 .category-tab.active {
-  background-color: #162447;
+  background-color: #284386;
 }
 
 .category-tab:hover {
-  background-color: #162447;
+  background-color: #3857a5;
 }
 
 .sidebar-content {
@@ -237,7 +237,7 @@ canvas {
   display: none;
 }
 
-.category-content button {
+button {
   margin: 10px 0;
   padding: 10px;
   background-color: #323cf5;
@@ -248,12 +248,6 @@ canvas {
   transition: background 0.3s;
 }
 
-.category-content button:hover {
+button:hover {
   background-color: #323cf5;
-}
-
-/* Highlight the active category tab */
-.category-tab.active {
-  background-color: #323cf5; /* Color for the active tab */
-  font-weight: bold;
 }

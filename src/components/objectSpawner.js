@@ -16,6 +16,8 @@ export default class ObjectSpawner extends Component {
   materials = {
     magnetPositive: null,
     magnetNegative: null,
+    magnetPositiveLambertian: null,
+    magnetNegativeLambertian: null,
   };
 
   models = {
@@ -29,6 +31,16 @@ export default class ObjectSpawner extends Component {
   start() {
     this.materials.magnetPositive = ResourceManager.getMaterial("toon");
     this.materials.magnetNegative = ResourceManager.getMaterial("toon").clone();
+
+    this.materials.magnetPositiveLambertian =
+      ResourceManager.getMaterial("lambertian").clone();
+    this.materials.magnetNegativeLambertian =
+      ResourceManager.getMaterial("lambertian").clone();
+    this.materials.magnetNegativeLambertian.uniforms.baseTexture.value =
+      ResourceManager.getTexture("negativeMagnetTexture");
+    this.materials.magnetPositiveLambertian.uniforms.baseTexture.value =
+      ResourceManager.getTexture("positiveMagnetTexture");
+
     this.models.magnet =
       ResourceManager.getModel("magnet").children[0].geometry;
 
@@ -67,6 +79,10 @@ export default class ObjectSpawner extends Component {
       object.properties.magnetType === "negative"
         ? this.materials.magnetNegative.clone()
         : this.materials.magnetPositive.clone();
+    const magnetLambertMaterial =
+      object.properties.magnetType === "negative"
+        ? this.materials.magnetNegativeLambertian.clone()
+        : this.materials.magnetPositiveLambertian.clone();
 
     const magnet = new GameObject(
       "Magnet",
@@ -75,6 +91,7 @@ export default class ObjectSpawner extends Component {
           geometry: this.models.magnet,
           outlineOverride: 1.15,
           material: magnetMaterial,
+          lambertMaterial: magnetLambertMaterial,
           defaultOverlayColor: new THREE.Vector3(1.8, 1.3, 1.3),
           highlightOutlineColor: new THREE.Vector3(1, 0.3, 0.3),
         }),
@@ -121,6 +138,7 @@ export default class ObjectSpawner extends Component {
         new Renderer({
           geometry: new THREE.SphereGeometry(0.12, 12, 12),
           material: materialShell,
+          lambertMaterial: ResourceManager.getMaterial("lambertian"),
         }),
       ],
       ["energySphere"]
@@ -134,6 +152,7 @@ export default class ObjectSpawner extends Component {
         new Renderer({
           geometry: new THREE.SphereGeometry(0.08, 12, 12),
           material,
+          lambertMaterial: ResourceManager.getMaterial("lambertian"),
         }),
         new PhysicsBody({
           mass: 1,

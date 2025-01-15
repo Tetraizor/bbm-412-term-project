@@ -54,7 +54,7 @@
     <!-- Sidebar -->
     <div id="settings" class="sidebar hidden">
       <div class="sidebar-header">
-        <h2>Menu</h2>
+        <h3>Menu</h3>
       </div>
       <div class="sidebar-categories">
         <button id="tabButton1" class="category-tab active">Buy Items</button>
@@ -101,9 +101,8 @@
           </p>
         </div>
         <div id="tab3" class="category-content hidden" id="category3">
-          <h2>Settings</h2>
-          <div class="divider"></div>
-          <h3>Light Direction</h3>
+          <h3>Light Settings</h3>
+          <h4 style="margin-top: 0.5rem">Direction</h4>
           <div
             style="
               display: flex;
@@ -136,7 +135,7 @@
                 min="-1"
                 max="1"
                 step="0.01"
-                value="0"
+                value="1"
               />
             </div>
             <div style="width: 100%; display: flex; flex-direction: row">
@@ -152,6 +151,43 @@
                 value="-.6"
               />
             </div>
+          </div>
+          <h4 style="margin-top: 0.5rem">Intensity</h4>
+          <div style="width: 100%; display: flex; flex-direction: row">
+            <p id="intensityFeedback" style="margin-right: 1rem">1.0</p>
+            <input
+              style="flex: 1"
+              type="range"
+              id="lightIntensity"
+              name="lightIntensity"
+              min=".2"
+              max="1.4"
+              step="0.01"
+              value="1"
+            />
+          </div>
+          <div class="divider"></div>
+          <h3 style="margin-top: 0.5rem">Rendering Mode</h3>
+          <div
+            style="
+              display: flex;
+              flex-direction: row;
+              align-items: stretch;
+              justify-content: stretch;
+              width: 100%;
+              gap: 1rem;
+            "
+          >
+            <button
+              id="shaderButton1"
+              class="category-tab active"
+              style="flex: 1"
+            >
+              Toon
+            </button>
+            <button id="shaderButton2" class="category-tab" style="flex: 1">
+              Standard
+            </button>
           </div>
         </div>
       </div>

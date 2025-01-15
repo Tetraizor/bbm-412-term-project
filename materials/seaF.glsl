@@ -7,7 +7,9 @@ uniform sampler2D heightMap;  // Texture used for height map
 
 out vec4 fragColor;
 
-const vec3 fogColor = vec3(0.82, 0.84, 0.94);
+uniform vec3 ambientColor;
+
+// const vec3 fogColor = vec3(0.82, 0.84, 0.94);
 const vec3 colorBottom = vec3(0.19, 0.39, 0.53); 
 const vec3 colorTop = vec3(1.0); 
 
@@ -37,7 +39,9 @@ float dither(vec2 coord, float ditherStrength, int pattern, float minOpacity) {
 }
 
 void main() {
-    float fogFactor = exp(-0.05 * v_fogDistance);
+    vec3 fogColor = ambientColor;
+
+    float fogFactor = exp(-0.03 * v_fogDistance);
     fogFactor = clamp(fogFactor, 0.0, 1.0);
 
     vec3 gradientColor = mix(colorBottom, colorTop, smoothstep(0.0, 1.0, v_height * 1.0));
@@ -53,9 +57,12 @@ void main() {
 
     vec2 pixelCoord = floor(gl_FragCoord.xy / pixelSize) * pixelSize;
     float ditherStrength = dither(pixelCoord, 0.3, 2, 0.8);
+
     toonColor = mix(toonColor, gradientColor * 1.5 * ditherStrength,  v_height);
 
     vec3 finalColor = mix(toonColor, fogColor, 1.0 - fogFactor);
+    finalColor = mix(finalColor, ambientColor, .4);
 
-    fragColor = vec4(finalColor, 1.0);
+    float op = 0.8 * min(max(1.0 - v_fogDistance * 0.014, 0.0), 1.0);
+    fragColor = vec4(finalColor.xyz, op);
 }

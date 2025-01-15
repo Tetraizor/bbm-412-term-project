@@ -23,6 +23,9 @@ export default {
   prerenderHooks: [],
   postrenderHooks: [],
 
+  skyboxMaterial: null,
+  cloud: null,
+
   debugMode: true,
 
   time: 0,
@@ -52,10 +55,13 @@ export default {
       "skybox",
       "./materials/skyboxV.glsl",
       "./materials/skyboxF.glsl",
-      {}
+      {
+        color1: { value: new THREE.Vector3(0.56, 0.76, 0.89) },
+        color2: { value: new THREE.Vector3(0.78, 0.83, 0.93) },
+      }
     );
-
     skyboxMaterial.side = THREE.BackSide;
+    this.skyboxMaterial = skyboxMaterial;
 
     const skyboxGeometry = new THREE.SphereGeometry(80);
     const skybox = new THREE.Mesh(skyboxGeometry, skyboxMaterial);

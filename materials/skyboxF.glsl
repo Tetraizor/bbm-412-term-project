@@ -2,11 +2,14 @@ varying vec3 vPosition;
 
 out vec4 fragColor;
 
+uniform vec3 color1;
+uniform vec3 color2;
+
 void main() {
     float t = (vPosition.y + 1.0) / 30.0;
 
-    vec3 colorTop = vec3(0.56, 0.76, 0.89);
-    vec3 colorBottom = vec3(0.78, 0.83, 0.93); 
+    vec3 colorTop = color1;
+    vec3 colorBottom = color2; 
 
     vec3 gradientColor = mix(colorBottom, colorTop, t);
 

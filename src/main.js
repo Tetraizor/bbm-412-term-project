@@ -124,11 +124,11 @@ async function loadResources() {
       lightColor: { value: new THREE.Color(1, 1, 1) },
       lightIntensity: { value: 1 },
       lightDirection: { value: new THREE.Vector3(1, 1, 1).normalize() },
-      diffuseColor: { value: new THREE.Color(0.5, 0.5, 1) },
       ambientColor: { value: new THREE.Color(0.2, 0.2, 0.2) },
       ambientIntensity: { value: 0.01 },
-      baseColor: { value: new THREE.Color(0.4, 0, 0.2, 1.0) },
-      baseTexture: { value: ResourceManager.getTexture("debugTexture") },
+      baseColor: { value: new THREE.Color(1.0, 1.0, 1.0) },
+      baseTexture: { value: ResourceManager.getTexture("whiteTexture") },
+      overlayColor: { value: new THREE.Color(1.0, 1.0, 1.0, 1.0) },
       time: { value: 0 },
       opacity: { value: 1 },
     }
@@ -148,6 +148,7 @@ async function loadResources() {
       baseTexture: { value: ResourceManager.getTexture("debugTexture") },
       time: { value: 0 },
       opacity: { value: 1 },
+      overlayColor: { value: new THREE.Color(1.0, 1.0, 1.0, 1.0) },
       heightMap: { value: ResourceManager.getTexture("heightMap") },
     }
   );
@@ -160,6 +161,7 @@ async function loadResources() {
       outlineThickness: { value: 0.02 },
       curvatureFactor: { value: 0.5 },
       distanceFactor: { value: 0.1 },
+      overlayColor: { value: new THREE.Color(1.0, 1.0, 1.0, 1.0) },
       outlineColor: { value: new THREE.Color(0.15, 0.15, 0.1) },
       // outlineColor: { value: new THREE.Color(1.0, 1.0, 1.0) },
     }
@@ -176,6 +178,7 @@ async function loadResources() {
       speed: { value: 0.5 },
       direction: { value: false },
       width: { value: 1 },
+      overlayColor: { value: new THREE.Color(1.0, 1.0, 1.0, 1.0) },
       length: { value: 1 },
     }
   );
@@ -205,6 +208,7 @@ async function createInitialScene() {
       new Renderer({
         geometry: new THREE.BoxGeometry(2.8, 0.1, 5.4),
         material: ResourceManager.getMaterial("toon"),
+        lambertMaterial: ResourceManager.getMaterial("lambertian"),
         hideOutline: true,
       }),
       new PhysicsBody({
@@ -238,6 +242,7 @@ async function createInitialScene() {
       new Renderer({
         geometry: new THREE.BoxGeometry(2.8, 0.1, 5.4),
         material: ResourceManager.getMaterial("toon"),
+        lambertMaterial: ResourceManager.getMaterial("lambertian"),
         hideOutline: true,
       }),
       new PhysicsBody({
@@ -271,6 +276,7 @@ async function createInitialScene() {
       new Renderer({
         geometry: new THREE.BoxGeometry(0.1, 0.18, 6),
         material: ResourceManager.getMaterial("toon"),
+        lambertMaterial: ResourceManager.getMaterial("lambertian"),
         hideOutline: true,
       }),
       new PhysicsBody({
@@ -292,6 +298,7 @@ async function createInitialScene() {
       new Renderer({
         geometry: new THREE.BoxGeometry(0.1, 0.18, 6),
         material: ResourceManager.getMaterial("toon"),
+        lambertMaterial: ResourceManager.getMaterial("lambertian"),
         hideOutline: true,
       }),
       new PhysicsBody({
@@ -313,6 +320,7 @@ async function createInitialScene() {
       new Renderer({
         geometry: new THREE.BoxGeometry(0.1, 0.18, 6),
         material: ResourceManager.getMaterial("toon"),
+        lambertMaterial: ResourceManager.getMaterial("lambertian"),
         hideOutline: true,
       }),
       new PhysicsBody({
@@ -334,6 +342,7 @@ async function createInitialScene() {
       new Renderer({
         geometry: new THREE.BoxGeometry(0.1, 0.2, 6),
         material: ResourceManager.getMaterial("toon"),
+        lambertMaterial: ResourceManager.getMaterial("lambertian"),
         hideOutline: true,
       }),
       new PhysicsBody({
@@ -456,9 +465,9 @@ async function createInitialScene() {
 }
 
 async function createTemporarySceneObjects() {
-  const lambertianMaterial = ResourceManager.getMaterial("lambertian");
-  const toonMaterial = ResourceManager.getMaterial("toon");
   const seaMaterial = ResourceManager.getMaterial("sea");
+  seaMaterial.transparent = true;
+  seaMaterial.zWrite = false;
 
   const sea = new GameObject(
     "Sea",
@@ -466,6 +475,7 @@ async function createTemporarySceneObjects() {
       new Renderer({
         geometry: new THREE.PlaneGeometry(400, 400, 1000, 1000),
         material: seaMaterial,
+        lambertMaterial: seaMaterial,
       }),
     ],
     ["sea"]
@@ -473,7 +483,11 @@ async function createTemporarySceneObjects() {
   sea.transform.setPosition(new Vector3(0, -8, 0));
   sea.transform.setRotation(new Vector3(-Math.PI / 2, 0, 0));
 
+  sea.getComponent(Renderer).mesh.renderOrder = 999;
+
   engine.instantiate(sea);
+
+  core.cloud = sea;
 
   const debugTexture = ResourceManager.getTexture("debugTexture");
   debugTexture.wrapS = THREE.RepeatWrapping;
@@ -515,12 +529,24 @@ async function createAirship() {
   airshipTexture.minFilter = THREE.NearestFilter;
 
   const shipMaterial = ResourceManager.getMaterial("toon");
+
   shipMaterial.side = THREE.DoubleSide;
   shipMaterial.uniforms.baseTexture.value = airshipTexture;
 
+  const shipLambertianMaterial = ResourceManager.getMaterial("lambertian");
+
+  shipLambertianMaterial.side = THREE.DoubleSide;
+  shipLambertianMaterial.uniforms.baseTexture.value = airshipTexture;
+
   const gearBack = new GameObject(
     "AirshipGearBack",
-    [new Renderer({ geometry: gearBackModel, material: shipMaterial })],
+    [
+      new Renderer({
+        geometry: gearBackModel,
+        material: shipMaterial,
+        lambertMaterial: shipLambertianMaterial,
+      }),
+    ],
     ["airship"]
   );
 
@@ -530,6 +556,7 @@ async function createAirship() {
       new Renderer({
         geometry: gearBottomModel,
         material: shipMaterial.clone(),
+        lambertMaterial: shipLambertianMaterial,
       }),
     ],
     ["airship"]
@@ -541,6 +568,7 @@ async function createAirship() {
       new Renderer({
         geometry: gearSidesModel,
         material: shipMaterial.clone(),
+        lambertMaterial: shipLambertianMaterial,
       }),
     ],
     ["airship"]
@@ -548,26 +576,48 @@ async function createAirship() {
 
   const wheel = new GameObject(
     "AirshipWheel",
-    [new Renderer({ geometry: wheelModel, material: shipMaterial.clone() })],
+    [
+      new Renderer({
+        geometry: wheelModel,
+        material: shipMaterial.clone(),
+        lambertMaterial: shipLambertianMaterial,
+      }),
+    ],
     ["airship"]
   );
 
   const wingL = new GameObject(
     "AirshipWingL",
-    [new Renderer({ geometry: wingLModel, material: shipMaterial.clone() })],
+    [
+      new Renderer({
+        geometry: wingLModel,
+        material: shipMaterial.clone(),
+        lambertMaterial: shipLambertianMaterial,
+      }),
+    ],
     ["airship"]
   );
 
   const wingR = new GameObject(
     "AirshipWingR",
-    [new Renderer({ geometry: wingRModel, material: shipMaterial.clone() })],
+    [
+      new Renderer({
+        geometry: wingRModel,
+        material: shipMaterial.clone(),
+        lambertMaterial: shipLambertianMaterial,
+      }),
+    ],
     ["airship"]
   );
 
   const body = new GameObject(
     "AirshipBody",
     [
-      new Renderer({ geometry: bodyModel, material: shipMaterial.clone() }),
+      new Renderer({
+        geometry: bodyModel,
+        material: shipMaterial.clone(),
+        lambertMaterial: shipLambertianMaterial,
+      }),
       new Airship(wingL, wingR, gearSides, gearBottom, gearBack, wheel),
     ],
     ["airship"]
@@ -575,7 +625,13 @@ async function createAirship() {
 
   const exhaust = new GameObject(
     "AirshipExhaust",
-    [new Renderer({ geometry: exhaustModel, material: shipMaterial.clone() })],
+    [
+      new Renderer({
+        geometry: exhaustModel,
+        material: shipMaterial.clone(),
+        lambertMaterial: shipLambertianMaterial,
+      }),
+    ],
     ["airship"]
   );
 
@@ -585,6 +641,7 @@ async function createAirship() {
       new Renderer({
         geometry: capacitorModel,
         material: shipMaterial.clone(),
+        lambertMaterial: shipLambertianMaterial,
       }),
     ],
     ["airship"]
@@ -597,6 +654,7 @@ async function createAirship() {
         geometry: dropperModel,
         material: shipMaterial.clone(),
         outlineOverride: 1.005,
+        lambertMaterial: shipLambertianMaterial,
       }),
       new Dropper(),
     ],

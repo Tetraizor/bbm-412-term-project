@@ -4,12 +4,17 @@ import core from "../core.js";
 import AmbientLight from "./light/ambientLight.js";
 import DirectionalLight from "./light/directionalLight.js";
 import ResourceManager from "../resourceManager.js";
+import { hexToRgb } from "../utils/colorUtils.js";
 
 export default class Renderer extends Component {
   mesh = null;
   material = null;
+  lambertMaterial = null;
+  toonMaterial = null;
   outlineMesh = null;
   outlineMaterial = null;
+
+  rendererType = "toon";
 
   OUTLINE_THICKNESS = 1.01;
   outlineOverride = 1;
@@ -25,6 +30,7 @@ export default class Renderer extends Component {
   constructor({
     geometry,
     material,
+    lambertMaterial,
     outlineOverride = 1,
     hideOutline = false,
     defaultOverlayColor = new THREE.Vector3(1.4, 1.4, 1.4),
@@ -37,10 +43,17 @@ export default class Renderer extends Component {
     }
 
     this.material = material;
+    this.toonMaterial = material.clone();
+    this.lambertMaterial = lambertMaterial;
     this.outlineOverride = outlineOverride;
     this.hideOutline = hideOutline;
     this.defaultOverlayColor = defaultOverlayColor;
     this.highlightOutlineColor = highlightOutlineColor;
+
+    if (!this.lambertMaterial) {
+      console.error("Lambert material not provided, using default material");
+      this.lambertMaterial = this.toonMaterial.clone();
+    }
 
     if (geometry.isObject3D) {
       this.mesh = new THREE.Mesh(geometry.geometry, this.material);
@@ -52,6 +65,8 @@ export default class Renderer extends Component {
 
       core.createMesh(this.mesh);
     }
+
+    core.gamePlayManager.registerRenderer(this);
   }
 
   onPositionChanged(position) {
@@ -138,7 +153,9 @@ export default class Renderer extends Component {
     if (core.directionalLight) {
       const directionalLight =
         core.directionalLight.getComponent(DirectionalLight).light;
-      const lightDirection = directionalLight.target.position;
+      const lightDirection = core.directionalLight
+        .getComponent(DirectionalLight)
+        .direction.normalize();
 
       lightDirection.sub(core.directionalLight.transform.position);
       lightDirection.normalize();
@@ -146,7 +163,10 @@ export default class Renderer extends Component {
       this.updateUniform("lightDirection", lightDirection);
       this.updateUniform(
         "lightColor",
-        core.directionalLight.getComponent(DirectionalLight).light.color
+        hexToRgb(
+          core.directionalLight.getComponent(DirectionalLight).color,
+          true
+        )
       );
 
       this.updateUniform(
@@ -172,10 +192,17 @@ export default class Renderer extends Component {
   toggleOutline(state) {
     if (state) {
       this.targetOutlineColor = this.highlightOutlineColor;
-      this.targetOverlayColor = this.defaultOverlayColor;
+      this.outlineMesh.visible = true;
     } else {
-      this.targetOutlineColor = new THREE.Vector3(0, 0, 0);
       this.targetOverlayColor = new THREE.Vector3(1, 1, 1);
+
+      if (this.rendererType == "toon") {
+        this.targetOverlayColor = this.defaultOverlayColor;
+        this.outlineMesh.visible = true;
+      } else {
+        this.targetOverlayColor = new THREE.Vector3(1, 1, 1);
+        this.outlineMesh.visible = false;
+      }
     }
   }
 
@@ -198,8 +225,11 @@ export default class Renderer extends Component {
   }
 
   updateUniform(name, value) {
-    if (this.material.uniforms?.hasOwnProperty(name)) {
-      this.material.uniforms[name].value = value;
+    if (this.lambertMaterial.uniforms?.hasOwnProperty(name)) {
+      this.lambertMaterial.uniforms[name].value = value;
+    }
+    if (this.toonMaterial.uniforms?.hasOwnProperty(name)) {
+      this.toonMaterial.uniforms[name].value = value;
     }
   }
 
@@ -208,5 +238,30 @@ export default class Renderer extends Component {
 
     core.removeMesh(this.mesh);
     core.removeMesh(this.outlineMesh);
+  }
+
+  changeRendererType(type) {
+    if (type == "toon") {
+      this.rendererType = "toon";
+      this.material = this.toonMaterial;
+
+      if (this.outlineMaterial) {
+        this.outlineMesh.visible = true;
+      }
+    } else {
+      this.rendererType = "lambertian";
+      this.material = this.lambertMaterial;
+
+      if (this.outlineMaterial) {
+        this.outlineMesh.visible = false;
+      }
+    }
+
+    this.material.uniforms.overlayColor.value = this.defaultOverlayColor;
+    this.material.uniforms.opacity.value = 1.0;
+
+    this.onLightPropertyChanged();
+
+    this.mesh.material = this.material;
   }
 }
