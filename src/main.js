@@ -564,3 +564,5 @@ async function createAirship() {
 }
 
 await start();
+
+export { createEnergySphere };
