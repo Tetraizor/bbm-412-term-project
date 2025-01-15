@@ -20,7 +20,7 @@ export default class EnergySphere extends Component {
     });
 
     this.physicsBody = this.gameObject.getComponent(PhysicsBody);
-    this.physicsBody.body.velocity.z = -0.5;
+    this.physicsBody.body.velocity.z = -1;
   }
 
   update() {

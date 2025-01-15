@@ -13,6 +13,7 @@ export default {
   ambientLight: null,
   raycast: null,
   objectSpawner: null,
+  gamePlayManager: null,
 
   // CANNON.js
   world: null,
@@ -21,7 +22,7 @@ export default {
   prerenderHooks: [],
   postrenderHooks: [],
 
-  debugMode: false,
+  debugMode: true,
 
   time: 0,
   lastTime: 0,

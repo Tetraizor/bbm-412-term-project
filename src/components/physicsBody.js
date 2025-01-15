@@ -12,7 +12,12 @@ export default class PhysicsBody extends Component {
   shapeWrapper = null;
   showGizmo = false;
 
-  constructor({ mass = 0, shape = null, showGizmo = false }) {
+  constructor({
+    mass = 0,
+    shape = null,
+    showGizmo = false,
+    collisionResponse = true,
+  }) {
     super();
 
     this.mass = mass;
@@ -36,6 +41,7 @@ export default class PhysicsBody extends Component {
     this.body = new CANNON.Body({
       mass: this.mass,
       shape: this.shape,
+      collisionResponse: collisionResponse,
     });
 
     core.world.addBody(this.body);

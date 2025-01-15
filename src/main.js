@@ -19,6 +19,7 @@ import Raycast from "./components/raycast.js";
 import Airship from "./components/airship.js";
 import Dropper from "./components/dropper.js";
 import PlacableSpace from "./components/placableSpace.js";
+import GamePlayManager from "./components/gameplayManager.js";
 
 const uiManager = new UIManager();
 
@@ -74,12 +75,17 @@ async function loadResources() {
   await ResourceManager.loadTexture("whiteTexture", "../textures/white.png");
   await ResourceManager.loadTexture("magnetTexture", "../textures/magnet.png");
   await ResourceManager.loadTexture("heightMap", "../textures/heightMap.png");
+  await ResourceManager.loadTexture(
+    "forceFieldTexture",
+    "../textures/forceField.png"
+  );
 
   // Load models.
   await ResourceManager.loadModel("table", "../models/table.fbx");
   await ResourceManager.loadModel("sea", "../models/sea.fbx");
   await ResourceManager.loadModel("magnet", "../models/magnet.fbx");
   await ResourceManager.loadModel("cursor", "../models/cursor.fbx");
+  await ResourceManager.loadModel("forceField", "../models/forceField.fbx");
 
   // Load materials.
   await ResourceManager.loadMaterial(
@@ -149,9 +155,33 @@ async function loadResources() {
       // outlineColor: { value: new THREE.Color(1.0, 1.0, 1.0) },
     }
   );
+
+  await ResourceManager.loadMaterial(
+    "forceField",
+    "../materials/forceFieldV.glsl",
+    "../materials/forceFieldF.glsl",
+    {
+      baseTexture: { value: ResourceManager.getTexture("forceFieldTexture") },
+      time: { value: 0 },
+      opacity: { value: 0.5 },
+      speed: { value: 0.5 },
+      direction: { value: false },
+      width: { value: 1 },
+      length: { value: 1 },
+    }
+  );
 }
 
 async function createInitialScene() {
+  const gamePlayManager = new GameObject(
+    "GamePlayManager",
+    [new GamePlayManager()],
+    ["gamePlayManager"]
+  );
+
+  engine.instantiate(gamePlayManager);
+  core.gamePlayManager = gamePlayManager.getComponent(GamePlayManager);
+
   const camera = new GameObject("Camera", [new CameraManager()], ["camera"]);
   camera.transform.setPosition(new Vector3(-4.7, 3.7, -4.5));
   camera.transform.setRotation(

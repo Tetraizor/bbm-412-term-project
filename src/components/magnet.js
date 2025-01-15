@@ -2,10 +2,28 @@ import Component from "./component.js";
 import { runForSeconds } from "../utils/asyncUtils.js";
 import { Vector3 } from "three";
 import core from "../core.js";
-import Raycast from "./raycast.js";
 import Renderer from "./renderer.js";
+import PhysicsBody from "./physicsBody.js";
+import GameObject from "../gameObject.js";
+import ForceField from "./forceField.js";
+import engine from "../engine.js";
+import GamePlayManager from "./gameplayManager.js";
 
 export default class Magnet extends Component {
+  forceField = null;
+
+  magnetType = null;
+  width = 1;
+  height = 2;
+
+  constructor({ magnetType, width = 1, height = 2 }) {
+    super();
+
+    this.magnetType = magnetType;
+    this.width = width;
+    this.height = height;
+  }
+
   start() {
     // Make grow animation.
     this.gameObject.transform.scale.set(0.1, 0.1, 0.1);
@@ -37,5 +55,36 @@ export default class Magnet extends Component {
         }
       }
     );
+
+    this.forceField = new GameObject(
+      "ForceField",
+      [
+        new PhysicsBody({
+          mass: 0,
+          shape: {
+            type: "box",
+            width: this.height / 2,
+            height: this.width / 2,
+            depth: 0.3,
+          },
+          showGizmo: core.debugMode,
+          collisionResponse: false,
+        }),
+        new ForceField({
+          magnet: this,
+          length: this.height,
+          width: this.width,
+        }),
+      ],
+      ["forceField"]
+    );
+
+    const forceFieldComponent = this.forceField.getComponent(ForceField);
+    core.gamePlayManager.registerForceField(forceFieldComponent);
+
+    this.forceField.transform.position.copy(this.gameObject.transform.position);
+    this.forceField.transform.rotation.copy(this.gameObject.transform.rotation);
+
+    engine.instantiate(this.forceField);
   }
 }
