@@ -230,6 +230,39 @@ async function createInitialScene() {
 
   engine.instantiate(physicsPlane);
 
+  const physicsPlane2 = new GameObject(
+    "Plane",
+    [
+      new Renderer({
+        geometry: new THREE.BoxGeometry(2.8, 0.1, 5.4),
+        material: ResourceManager.getMaterial("toon"),
+        hideOutline: true,
+      }),
+      new PhysicsBody({
+        mass: 0,
+        shape: {
+          type: "box",
+          width: 1.4,
+          height: 0.1,
+          depth: 2.7,
+        },
+        showGizmo: false,
+      }),
+      new PlacableSpace(),
+    ],
+    ["plane"]
+  );
+
+  physicsPlane2.getComponent(Renderer).material.uniforms.baseColor.value =
+    new THREE.Color(1, 1, 1, 1);
+
+  physicsPlane2.transform.setPosition(new Vector3(4, 0, -0.3));
+  physicsPlane2.transform.setRotation(new Vector3(0, 0, 0));
+  physicsPlane2.transform.setScale(new Vector3(1, 1, 1));
+  physicsPlane2.getComponent(Renderer).mesh.visible = false;
+
+  engine.instantiate(physicsPlane2);
+
   const boundary1 = new GameObject(
     "Boundary1",
     [

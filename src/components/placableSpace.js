@@ -13,6 +13,7 @@ export default class PlacableSpace extends Component {
   isHovering = false;
   cursor = null;
   cursorPosition = new THREE.Vector3();
+  objectPreview = null;
 
   objectState = null;
 
@@ -31,6 +32,17 @@ export default class PlacableSpace extends Component {
     this.physicsBody = this.gameObject.getComponent(PhysicsBody);
     this.renderer = this.gameObject.getComponent(Renderer);
     this.objectSpawner = core.objectSpawner;
+
+    const previewGeometry = new THREE.BoxGeometry(1, 1, 1);
+    const previewMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+
+    previewMaterial.transparent = true;
+    previewMaterial.opacity = 0.5;
+
+    this.objectPreview = new THREE.Mesh(previewGeometry, previewMaterial);
+    this.objectPreview.renderOrder = 999;
+
+    this.objectPreview.rotation.set(-Math.PI / 2, 0, 0);
 
     core.raycast.addListener(this.renderer.mesh, (result) => {
       this.checkHover(result);
@@ -67,7 +79,9 @@ export default class PlacableSpace extends Component {
     this.cursor.scale.set(0.25, 0.25, 1);
 
     core.scene.add(this.cursor);
+    core.scene.add(this.objectPreview);
     this.cursor.visible = false;
+    this.objectPreview.visible = false;
 
     core.gamePlayManager.registerPlacableSpace(this);
   }
@@ -86,7 +100,10 @@ export default class PlacableSpace extends Component {
       this.cursorPosition.y += 0.1;
       this.cursor.position.copy(this.cursorPosition);
 
+      this.objectPreview.position.copy(this.cursorPosition);
+
       this.cursor.visible = true;
+      this.objectPreview.visible = true;
       this.isHovering = true;
       this.objectState = result.intersect;
     }
@@ -97,6 +114,7 @@ export default class PlacableSpace extends Component {
       }
 
       this.cursor.visible = false;
+      this.objectPreview.visible = false;
       this.isHovering = false;
       this.objectState = null;
 
@@ -108,6 +126,7 @@ export default class PlacableSpace extends Component {
       this.cursorPosition.y += 0.04;
 
       this.cursor.position.lerp(this.cursorPosition, 0.2);
+      this.objectPreview.position.lerp(this.cursorPosition, 0.2);
 
       this.cursor.rotation.z += 0.01;
       this.cursor.scale
@@ -143,11 +162,17 @@ export default class PlacableSpace extends Component {
     this.isSpawning = false;
 
     this.cursor.visible = false;
+    this.objectPreview.visible = false;
   }
 
   setSpawningObject(object) {
     this.spawningObject = object;
     this.isSpawning = true;
+
+    console.log(object);
+    this.objectPreview.geometry.dispose();
+    this.objectPreview.geometry =
+      this.objectSpawner.models[object.type].clone();
   }
 
   cancelSpawn() {

@@ -76,12 +76,11 @@ export default class GamePlayManager extends Component {
 
   buyItem({ item }) {
     const itemData = this.itemDb[item];
+
     if (!itemData) {
       console.log("Item " + item + " not found");
       return;
     }
-
-    console.log("Buying", itemData);
 
     if (this.components < itemData.price) {
       console.log("Not enough components");
@@ -100,6 +99,10 @@ export default class GamePlayManager extends Component {
   acceptPurchase({ item }) {
     this.components -= item.price;
     this.buyingItem = null;
+
+    this.placableSpaces.forEach((space) => {
+      space.cancelSpawn();
+    });
 
     this.updateUI();
   }
