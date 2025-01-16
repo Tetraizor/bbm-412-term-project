@@ -18,8 +18,6 @@ export default class AudioManager extends Component {
   }
 
   start() {
-    console.log("Audio manager started");
-
     for (let key in this.audioBank.sfx) {
       this.audioBank.sfx[key].volume = this.volume;
     }

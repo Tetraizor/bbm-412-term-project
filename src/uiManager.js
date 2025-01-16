@@ -129,7 +129,11 @@ export default class UIManager {
       const level = new URLSearchParams(window.location.search).get("level");
       const thisLevel = parseInt(level);
 
-      window.location.href = `./start.html?level=${thisLevel + 1}`;
+      if (thisLevel == 3) {
+        window.location.href = "./index.html";
+      } else {
+        window.location.href = `./start.html?level=${thisLevel + 1}`;
+      }
     });
   }
 

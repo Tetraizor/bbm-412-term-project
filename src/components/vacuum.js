@@ -40,7 +40,6 @@ export default class Vacuum extends Component {
         (bodyA === sphereBody && bodyB === this.body) ||
         (bodyB === sphereBody && bodyA === this.body)
       ) {
-        console.log("Sphere exited.");
       }
     });
   }

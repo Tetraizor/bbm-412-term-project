@@ -114,6 +114,7 @@ async function loadResources() {
   await ResourceManager.loadModel("forceField", "../models/forceField.fbx");
   await ResourceManager.loadModel("cone", "../models/cone.fbx");
   await ResourceManager.loadModel("lava1", "../models/lava1.fbx");
+  await ResourceManager.loadModel("lava2", "../models/lava2.fbx");
   await ResourceManager.loadModel("strongMagnet", "../models/strongMagnet.fbx");
   await ResourceManager.loadModel("cube", "../models/cube.fbx");
   await ResourceManager.loadModel("ramp", "../models/ramp.fbx");
@@ -521,8 +522,6 @@ async function createInitialScene() {
   names.transform.setRotation(new Vector3(-Math.PI / 2, 0, 0));
   names.transform.setScale(new Vector3(1, 1, 1));
 
-  console.log(namesModel);
-
   engine.instantiate(names);
 }
 
@@ -758,8 +757,6 @@ async function createAirship() {
 }
 
 function createLevel(id) {
-  console.log("Starting level " + id);
-
   switch (id) {
     case "1":
       createLevel1();
@@ -773,7 +770,13 @@ function createLevel(id) {
   }
 }
 
+function createLevel0() {
+  core.gamePlayManager.components = 999;
+}
+
 function createLevel1() {
+  core.gamePlayManager.components = 40;
+
   const lavaTexture = ResourceManager.getTexture("lava");
   lavaTexture.wrapS = THREE.RepeatWrapping;
   lavaTexture.wrapT = THREE.RepeatWrapping;
@@ -817,8 +820,152 @@ function createLevel1() {
   engine.instantiate(lava1);
 }
 
-function createLevel2() {}
+function createLevel2() {
+  core.gamePlayManager.components = 60;
 
-function createLevel3() {}
+  const lavaTexture = ResourceManager.getTexture("lava");
+  lavaTexture.wrapS = THREE.RepeatWrapping;
+  lavaTexture.wrapT = THREE.RepeatWrapping;
+  lavaTexture.repeat.set(1, 1);
+
+  lavaTexture.minFilter = THREE.LinearFilter;
+  lavaTexture.magFilter = THREE.LinearFilter;
+
+  const lavaLambertian = ResourceManager.getMaterial("lambertian");
+  lavaLambertian.uniforms.baseTexture.value = lavaTexture;
+
+  const lavaToon = ResourceManager.getMaterial("toon");
+  lavaToon.uniforms.baseTexture.value = lavaTexture;
+
+  const lava2 = new GameObject(
+    "Lava1",
+    [
+      new Renderer({
+        geometry: ResourceManager.getModel("lava2").children[0].geometry,
+        material: lavaToon,
+        lambertMaterial: lavaLambertian,
+      }),
+      new PhysicsBody({
+        mass: 0,
+        shape: {
+          type: "custom",
+        },
+        geometry: ResourceManager.getModel("lava2").children[0].geometry,
+        showGizmo: core.debugMode,
+        collisionResponse: false,
+      }),
+      new Lava(),
+    ],
+    ["lava2"]
+  );
+
+  lava2.transform.setPosition(new Vector3(-1.4, 0, -1));
+  lava2.transform.setScale(new Vector3(1, 1, 1));
+  lava2.transform.setRotation(new Vector3(-Math.PI / 2, 0, 0));
+
+  engine.instantiate(lava2);
+}
+
+function createLevel3() {
+  core.gamePlayManager.components = 120;
+
+  const lavaTexture = ResourceManager.getTexture("lava");
+  lavaTexture.wrapS = THREE.RepeatWrapping;
+  lavaTexture.wrapT = THREE.RepeatWrapping;
+  lavaTexture.repeat.set(1, 1);
+
+  lavaTexture.minFilter = THREE.LinearFilter;
+  lavaTexture.magFilter = THREE.LinearFilter;
+
+  const lavaLambertian = ResourceManager.getMaterial("lambertian");
+  lavaLambertian.uniforms.baseTexture.value = lavaTexture;
+
+  const lavaToon = ResourceManager.getMaterial("toon");
+  lavaToon.uniforms.baseTexture.value = lavaTexture;
+
+  const lava2 = new GameObject(
+    "Lava1",
+    [
+      new Renderer({
+        geometry: ResourceManager.getModel("lava2").children[0].geometry,
+        material: lavaToon,
+        lambertMaterial: lavaLambertian,
+      }),
+      new PhysicsBody({
+        mass: 0,
+        shape: {
+          type: "custom",
+        },
+        geometry: ResourceManager.getModel("lava2").children[0].geometry,
+        showGizmo: core.debugMode,
+        collisionResponse: false,
+      }),
+      new Lava(),
+    ],
+    ["lava2"]
+  );
+
+  lava2.transform.setPosition(new Vector3(-1.4, 0, 2));
+  lava2.transform.setScale(new Vector3(1, 1, 1));
+  lava2.transform.setRotation(new Vector3(-Math.PI / 2, 0, 0));
+
+  engine.instantiate(lava2);
+
+  const lava1 = new GameObject(
+    "Lava1",
+    [
+      new Renderer({
+        geometry: ResourceManager.getModel("lava1").children[0].geometry,
+        material: lavaToon,
+        lambertMaterial: lavaLambertian,
+      }),
+      new PhysicsBody({
+        mass: 0,
+        shape: {
+          type: "custom",
+        },
+        geometry: ResourceManager.getModel("lava1").children[0].geometry,
+        showGizmo: core.debugMode,
+        collisionResponse: false,
+      }),
+      new Lava(),
+    ],
+    ["lava1"]
+  );
+
+  lava1.transform.setPosition(new Vector3(-1.4, 0.2, -0.5));
+  lava1.transform.setScale(new Vector3(1, 1, 1));
+  lava1.transform.setRotation(new Vector3(-Math.PI / 2, 0, 0));
+
+  engine.instantiate(lava1);
+
+  const lava3 = new GameObject(
+    "lava3",
+    [
+      new Renderer({
+        geometry: ResourceManager.getModel("lava1").children[0].geometry,
+        material: lavaToon,
+        lambertMaterial: lavaLambertian,
+      }),
+      new PhysicsBody({
+        mass: 0,
+        shape: {
+          type: "custom",
+        },
+        geometry: ResourceManager.getModel("lava1").children[0].geometry,
+        showGizmo: core.debugMode,
+        collisionResponse: false,
+      }),
+      new Lava(),
+    ],
+    ["lava3"]
+  );
+
+  lava3.transform.setPosition(new Vector3(1.4, 0.2, -2));
+  lava3.transform.setScale(new Vector3(1, 1, 1));
+  lava3.transform.setRotation(new Vector3(-Math.PI / 2, Math.PI, 0));
+
+  engine.instantiate(lava3);
+}
 
 await start();

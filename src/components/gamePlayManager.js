@@ -16,21 +16,21 @@ export default class GamePlayManager extends Component {
 
   itemDb = {
     negativeMagnet: {
-      price: 5,
+      price: 8,
       type: "magnet",
       properties: {
         magnetType: "negative",
       },
     },
     positiveMagnet: {
-      price: 5,
+      price: 8,
       type: "magnet",
       properties: {
         magnetType: "positive",
       },
     },
     strongPositiveMagnet: {
-      price: 10,
+      price: 12,
       type: "strongMagnet",
       properties: {
         magnetType: "positive",
@@ -38,7 +38,7 @@ export default class GamePlayManager extends Component {
       },
     },
     strongNegativeMagnet: {
-      price: 10,
+      price: 12,
       type: "strongMagnet",
       properties: {
         magnetType: "negative",
@@ -53,11 +53,11 @@ export default class GamePlayManager extends Component {
       },
     },
     cube: {
-      price: 5,
+      price: 20,
       type: "cube",
     },
     ramp: {
-      price: 5,
+      price: 25,
       type: "ramp",
     },
   };
@@ -239,11 +239,6 @@ export default class GamePlayManager extends Component {
 
   start() {
     this.updateUI();
-
-    setTimeout(() => {
-      console.log("Setting rendering mode to lambertian");
-      this.setRenderingMode("lambertian");
-    }, 300);
   }
 
   gameRunning = true;
@@ -292,7 +287,6 @@ export default class GamePlayManager extends Component {
   }
 
   won() {
-    console.log("You won!");
     core.audioManager.playSFX("won");
 
     core.uiManager.toggle("won");
@@ -302,20 +296,18 @@ export default class GamePlayManager extends Component {
     score += 2000 - 20 * (core.time / 1000);
 
     document.getElementById("score").innerText = score.toFixed(0);
-    document.getElementById("spheresLeft").innerText =
-      this.spheresLeft.toFixed(0).toString() + " seconds";
+    document.getElementById("spheresLeft").innerText = this.spheresLeft
+      .toFixed(0)
+      .toString();
     document.getElementById("componentsLeft").innerText =
       this.components.toFixed(0);
-    document.getElementById("timeLeft").innerText = (core.time / 1000).toFixed(
-      2
-    );
+    document.getElementById("timeLeft").innerText =
+      (core.time / 1000).toFixed(2) + " seconds";
 
     this.gameRunning = false;
   }
 
   loose() {
-    console.log("You lost!");
-
     core.uiManager.toggle("lost");
 
     this.gameRunning;
